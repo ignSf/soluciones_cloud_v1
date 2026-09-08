@@ -1,6 +1,6 @@
 package com.example.demo.config;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -10,8 +10,14 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2TokenValidator;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtDecoders;
+import org.springframework.security.oauth2.jwt.JwtValidators;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -20,48 +26,47 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    @Value("${cognito.client-id}")
+    private String clientId;
+
+    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
+    private String issuerUri;
+
+    @Value("${cognito.jwks-url}")
+    private String jwksUrl;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // 1. Habilitar CORS explícito para el Frontend en localhost:5173
+            // 1. CORS unificado
             .cors(Customizer.withDefaults())
 
-            // 2. Desactivar CSRF (no se requiere para APIs REST sin cookies de sesión)
+            // 2. Desactivar CSRF para API stateless
             .csrf(AbstractHttpConfigurer::disable)
 
-            // 3. Establecer sesión Stateless (cada petición debe llevar su propio token)
-            .sessionManagement(session -> 
+            // 3. Política de sesión STATELESS
+            .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
 
-            // 4. Reglas de autorización de endpoints
+            // 4. Reglas de autorización
             .authorizeHttpRequests(auth -> auth
-                // Permitir todas las peticiones preflight OPTIONS de CORS
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                // Consola H2 para depuración
                 .requestMatchers("/h2-console/**").permitAll()
-
-                // GET /api/products es público (cualquiera puede ver el catálogo)
                 .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
-
-                // POST y DELETE requieren autenticación obligatoria con JWT
                 .requestMatchers(HttpMethod.POST, "/api/products/**").authenticated()
                 .requestMatchers(HttpMethod.DELETE, "/api/products/**").authenticated()
-
-                // Cualquier otra petición debe estar autenticada
                 .anyRequest().authenticated()
             )
 
-            // 5. Conectar nuestro filtro manual de JWT antes de los filtros estándar de Spring
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            // 5. Configurar Resource Server nativo con JWT
+            .oauth2ResourceServer(oauth2 -> oauth2
+                .jwt(jwt -> jwt.decoder(jwtDecoder()))
+            )
 
-            // 6. Permitir ver la consola H2 en frames
+            // 6. Permitir visualización de consola H2 en frames
             .headers(headers -> headers
                 .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
             );
@@ -70,9 +75,21 @@ public class SecurityConfig {
     }
 
     @Bean
+    public JwtDecoder jwtDecoder() {
+        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withJwkSetUri(jwksUrl).build();
+
+        OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(issuerUri);
+        OAuth2TokenValidator<Jwt> cognitoValidator = new CognitoAccessTokenValidator(clientId);
+        OAuth2TokenValidator<Jwt> combinedValidator = new DelegatingOAuth2TokenValidator<>(withIssuer, cognitoValidator);
+
+        jwtDecoder.setJwtValidator(combinedValidator);
+        return jwtDecoder;
+    }
+
+    @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of("*"));
+        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "X-Requested-With"));
         configuration.setExposedHeaders(List.of("Authorization"));
@@ -83,3 +100,4 @@ public class SecurityConfig {
         return source;
     }
 }
+

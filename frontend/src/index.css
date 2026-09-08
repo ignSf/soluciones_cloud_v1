@@ -108,13 +108,23 @@ body {
   gap: 0.75rem;
 }
 
-.user-badge {
+.user-email {
   background-color: rgba(56, 189, 248, 0.1);
   color: var(--primary);
   border: 1px solid rgba(56, 189, 248, 0.3);
   font-size: 0.85rem;
   padding: 0.35rem 0.75rem;
   border-radius: 6px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-auth {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 .btn-login {
@@ -152,6 +162,7 @@ body {
   font-size: 0.85rem;
   color: var(--text-muted);
 }
+
 
 /* Main */
 .main-content {

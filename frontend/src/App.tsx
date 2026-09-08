@@ -13,8 +13,8 @@ export function App() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Obtener el token JWT del usuario autenticado (id_token contiene claims de usuario y firma RS256)
-  const userToken = auth.user?.id_token ?? auth.user?.access_token;
+  // Obtener estrictamente el access_token para autorizar llamadas a la API (NUNCA el id_token)
+  const userToken = auth.user?.access_token;
 
   const fetchProducts = async () => {
     try {
@@ -24,7 +24,7 @@ export function App() {
       setProducts(data);
     } catch (err: any) {
       console.error(err);
-      setErrorMessage('No se pudo conectar con el Backend (Spring Boot en http://localhost:8080). Asegúrate de que esté en ejecución.');
+      setErrorMessage('No se pudo conectar con el servicio de productos. Asegúrese de que el backend esté en ejecución.');
     } finally {
       setIsLoading(false);
     }

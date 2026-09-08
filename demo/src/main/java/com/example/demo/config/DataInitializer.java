@@ -6,6 +6,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Configuration
@@ -19,19 +20,19 @@ public class DataInitializer {
                     Product.builder()
                         .name("Laptop Dell XPS 15")
                         .description("Intel Core i7, 16GB RAM, 512GB SSD")
-                        .price(1499.99)
+                        .price(new BigDecimal("1499.99"))
                         .category("Hardware")
                         .build(),
                     Product.builder()
                         .name("Monitor LG UltraWide 34\"")
                         .description("Resolución WQHD 144Hz IPS")
-                        .price(599.50)
+                        .price(new BigDecimal("599.50"))
                         .category("Periféricos")
                         .build(),
                     Product.builder()
                         .name("Suscripción Azure Cloud")
                         .description("Créditos de cómputo y servicios cognitivos")
-                        .price(250.00)
+                        .price(new BigDecimal("250.00"))
                         .category("Servicios Cloud")
                         .build()
                 ));
