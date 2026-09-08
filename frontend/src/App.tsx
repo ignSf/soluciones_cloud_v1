@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from 'react-oidc-context';
 import type { Product } from './types/product';
 import { productService } from './services/productService';
 import { Navbar } from './components/Navbar';
@@ -7,9 +8,13 @@ import { ProductForm } from './components/ProductForm';
 import './index.css';
 
 export function App() {
+  const auth = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Obtener estrictamente el access_token para autorizar llamadas a la API (NUNCA el id_token)
+  const userToken = auth.user?.access_token;
 
   const fetchProducts = async () => {
     try {
@@ -19,7 +24,7 @@ export function App() {
       setProducts(data);
     } catch (err: any) {
       console.error(err);
-      setErrorMessage('No se pudo conectar con el Backend (Spring Boot en http://localhost:8080). Asegúrate de que esté en ejecución.');
+      setErrorMessage('No se pudo conectar con el servicio de productos. Asegúrese de que el backend esté en ejecución.');
     } finally {
       setIsLoading(false);
     }
@@ -30,19 +35,35 @@ export function App() {
   }, []);
 
   const handleCreateProduct = async (newProduct: Product) => {
-    const created = await productService.create(newProduct);
-    setProducts((prev) => [...prev, created]);
+    if (!auth.isAuthenticated) {
+      alert('⚠️ Acción no autorizada: Debes iniciar sesión con AWS Cognito en el botón superior para crear productos.');
+      return;
+    }
+
+    try {
+      const created = await productService.create(newProduct, userToken);
+      setProducts((prev) => [...prev, created]);
+    } catch (err: any) {
+      alert(err.message || 'Error al guardar el producto');
+      console.error(err);
+    }
   };
 
   const handleDeleteProduct = async (id: number) => {
+    if (!auth.isAuthenticated) {
+      alert('⚠️ Acción no autorizada: Debes iniciar sesión con AWS Cognito para eliminar productos.');
+      return;
+    }
+
     if (!window.confirm('¿Seguro que deseas eliminar este producto de la base de datos?')) {
       return;
     }
+
     try {
-      await productService.delete(id);
+      await productService.delete(id, userToken);
       setProducts((prev) => prev.filter((p) => p.id !== id));
-    } catch (err) {
-      alert('Error al eliminar el producto');
+    } catch (err: any) {
+      alert(err.message || 'Error al eliminar el producto');
       console.error(err);
     }
   };
