@@ -1,11 +1,10 @@
 import type { AuthProviderProps } from 'react-oidc-context';
 
 const cognitoDomain = 'https://us-east-1ol9djb9xl.auth.us-east-1.amazoncognito.com';
-
 export const cognitoAuthConfig: AuthProviderProps = {
   authority: 'https://cognito-idp.us-east-1.amazonaws.com/us-east-1_OL9DjB9XL',
   client_id: '53acsgrc0tneq7jhigesj93g8r',
-  redirect_uri: 'http://localhost:5173/',
+  redirect_uri: typeof window !== 'undefined' ? window.location.origin + '/' : 'https://soluciones-cloud-v1.vercel.app/',
   response_type: 'code',
   scope: 'email openid phone',
   metadata: {

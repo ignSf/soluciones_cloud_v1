@@ -1,6 +1,6 @@
 import type { Product } from '../types/product';
 
-const API_BASE_URL = 'http://localhost:8080/api/products';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://soluciones-cloud-v1.onrender.com/api/products';
 
 export const productService = {
   /**

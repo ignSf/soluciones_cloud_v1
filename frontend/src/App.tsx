@@ -23,8 +23,7 @@ export function App() {
       const data = await productService.getAll();
       setProducts(data);
     } catch (err: any) {
-      console.error(err);
-      setErrorMessage('No se pudo conectar con el Backend (Spring Boot en http://localhost:8080). Asegúrate de que esté en ejecución.');
+      setErrorMessage('No se pudo conectar con el Backend en Render (https://soluciones-cloud-v1.onrender.com). Asegúrate de que el servicio haya terminado de desplegar.');
     } finally {
       setIsLoading(false);
     }
