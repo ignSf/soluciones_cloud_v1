@@ -1,6 +1,5 @@
 package com.example.demo.config;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -11,7 +10,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -20,10 +18,7 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
-
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -58,8 +53,8 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
 
-            // 5. Conectar nuestro filtro manual de JWT antes de los filtros estándar de Spring
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            // 5. Autenticación JWT nativa mediante OAuth2 Resource Server
+            .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
 
             // 6. Permitir ver la consola H2 en frames
             .headers(headers -> headers
