@@ -300,3 +300,17 @@ El resultado es una arquitectura segura, escalable, sin estado (*Stateless*), re
 | **"¿Por qué tu backend no guarda sesiones en memoria ni usa cookies?"** | *"Porque implementamos una arquitectura Stateless. Al utilizar tokens JWT firmados, cada petición viaja con su propia prueba de autenticidad. Esto permite que el backend pueda escalar horizontalmente en múltiples instancias sin necesidad de compartir sesiones en memoria."* |
 | **"¿Por qué usas PKCE si ya estás usando HTTPS?"** | *"HTTPS protege los datos contra espías en el cable de red (en tránsito), pero no protege el código de autorización contra aplicaciones o extensiones maliciosas instaladas dentro del propio dispositivo o navegador del cliente. PKCE garantiza que solo la instancia exacta de la aplicación que pidió el login sea la que pueda canjear el código por tokens."* |
 | **"¿Qué pasa si Supabase se queda sin conexiones disponibles?"** | *"Para evitar la saturación de conexiones, conectamos nuestro backend mediante el Session Pooler en el puerto 5432. Esto desacopla las conexiones físicas de PostgreSQL de las conexiones lógicas que gestiona el pool interno HikariCP de Spring Boot, maximizando la concurrencia."* |
+
+---
+
+# 🌐 TABLA DE INFRAESTRUCTURA Y SERVICIOS EN VIVO
+
+| Componente | Servicio / Proveedor | URL / Identificador |
+| :--- | :--- | :--- |
+| **Frontend SPA** | Vercel | `https://soluciones-cloud-v1.vercel.app` |
+| **API Gateway** | Amazon API Gateway (REST) | `https://8086dx45a7.execute-api.us-east-1.amazonaws.com/prod` |
+| **Backend API** | Render (Docker / Spring Boot) | `https://soluciones-cloud-v1.onrender.com` |
+| **Identity Provider** | AWS Cognito User Pool | `us-east-1_OL9DjB9XL` (Client ID: `53acsgrc0tneq7jhigesj93g8r`) |
+| **Database** | Supabase (PostgreSQL) | `aws-0-us-east-1.pooler.supabase.com:5432` |
+| **Repositorio** | GitHub | `https://github.com/ignSf/soluciones_cloud_v1` |
+
