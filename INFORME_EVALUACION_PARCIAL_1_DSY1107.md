@@ -30,8 +30,7 @@
 8. [Persistencia Cloud: PostgreSQL en Supabase](#8-persistencia-cloud-postgresql-en-supabase)
 9. [Flujos de Seguridad y Criptografía de Tokens (JWT)](#9-flujos-de-seguridad-y-criptografía-de-tokens-jwt)
 10. [Evidencias de Pruebas y Validación de Seguridad](#10-evidencias-de-pruebas-y-validación-de-seguridad)
-11. [Matriz de Cumplimiento de la Pauta de Evaluación (Rúbrica 100%)](#11-matriz-de-cumplimiento-de-la-pauta-de-evaluación-rúbrica-100)
-12. [Conclusiones](#12-conclusiones)
+11. [Conclusiones](#11-conclusiones)
 
 ---
 
@@ -393,44 +392,7 @@ El backend de Spring Boot no realiza llamadas HTTP a Cognito por cada petición 
 
 ---
 
-## 11. MATRIZ DE CUMPLIMIENTO DE LA PAUTA DE EVALUACIÓN (RÚBRICA 100%)
-
-A continuación se detalla el cumplimiento estricto de los indicadores establecidos en la rúbrica oficial de la **Evaluación Parcial N° 1**:
-
-```
-┌────────────────────────────────────────────────────────────────────────────────────────┐
-│                      MATRIZ DE EVALUACIÓN SEGÚN RÚBRICA DUOC UC                        │
-├────────────────────────────────────────┬────────────┬─────────────┬────────────────────┤
-│ Indicador de Evaluación Oficial        │ Ponderación│ Nivel Logro │ Evidencia Concreta │
-├────────────────────────────────────────┼────────────┼─────────────┼────────────────────┤
-│ 1. Configura y utiliza correctamente   │    60%     │  100%       │ • AWS Cognito User │
-│    la integración del IDaaS con el     │            │  (Muy Buen  │   Pool operativo.  │
-│    Frontend, permitiendo flujo de      │            │ Desempeño)  │ • PKCE integrado.  │
-│    usuario y obtención de tokens.      │            │             │ • Tokens en memoria│
-│                                        │            │             │   y en llamadas.   │
-├────────────────────────────────────────┼────────────┼─────────────┼────────────────────┤
-│ 2. Configura correctamente el BFF      │    40%     │  100%       │ • Resource Server  │
-│    y API Manager para validar el token │            │  (Muy Buen  │   con Spring Sec.  │
-│    recibido del IDaaS y autorizar solo │            │ Desempeño)  │ • Valida issuer,   │
-│    peticiones legítimas.               │            │             │   exp y firma JWKS.│
-├────────────────────────────────────────┴────────────┴─────────────┴────────────────────┤
-│ NOTA ESTIMADA SEGÚN CRITERIOS: 100% (7.0 SOBRESALIENTE)                                │
-└────────────────────────────────────────────────────────────────────────────────────────┘
-```
-
-### Justificación Detallada:
-1. **Indicador 1 (60%):**
-   * El inicio y cierre de sesión funcionan de manera transparente y sin caídas a través de la interfaz alojada de Cognito.
-   * La biblioteca cliente en React implementa el estándar PKCE, intercambiando el código temporal de forma automática y silenciosa.
-   * Los tokens `id_token` y `access_token` son administrados correctamente; el primero para la experiencia del usuario y el segundo para la autorización de llamadas a las APIs en `productService.ts`.
-2. **Indicador 2 (40%):**
-   * El BFF (Spring Boot) valida el emisor (`iss`), la audiencia (`client_id`), la vigencia (`exp`) y la firma digital asimétrica del token mediante el algoritmo `RS256`.
-   * Bloquea taxativamente cualquier intento de acceso no autorizado con código `401 Unauthorized`.
-   * El API Gateway actúa como escudo frontal resolviendo el pre-vuelo CORS y canalizando el tráfico de forma óptima hacia el backend.
-
----
-
-## 12. CONCLUSIONES
+## 11. CONCLUSIONES
 
 1. **Adopción exitosa de Estándares de la Industria:** La implementación de OAuth 2.0 con PKCE en el frontend y un Resource Server sin estado en Spring Boot demuestra que no es necesario reinventar mecanismos propietarios de autenticación. Utilizar estándares abiertos asegura compatibilidad, robustez y protección contra ataques comunes.
 2. **Seguridad Integral Delegada:** Al transferir la gestión de credenciales a AWS Cognito, el sistema garantiza el cumplimiento de normativas de privacidad y elimina la superficie de ataque asociada al almacenamiento de contraseñas locales.
