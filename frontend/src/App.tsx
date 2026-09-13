@@ -13,6 +13,9 @@ export function App() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // Control de pantalla: 'inicio' | 'tienda' | 'inventario'
+  const [pagina, setPagina] = useState<'inicio' | 'tienda' | 'inventario'>('inicio');
+
   // Obtener el token JWT del usuario autenticado (id_token contiene claims de usuario y firma RS256)
   const userToken = auth.user?.id_token ?? auth.user?.access_token;
 
@@ -35,7 +38,7 @@ export function App() {
 
   const handleCreateProduct = async (newProduct: Product) => {
     if (!auth.isAuthenticated) {
-      alert('⚠️ Acción no autorizada: Debes iniciar sesión con AWS Cognito en el botón superior para crear productos.');
+      alert('Acción no autorizada: Debes iniciar sesión con AWS Cognito en el botón superior para crear productos.');
       return;
     }
 
@@ -50,7 +53,7 @@ export function App() {
 
   const handleDeleteProduct = async (id: number) => {
     if (!auth.isAuthenticated) {
-      alert('⚠️ Acción no autorizada: Debes iniciar sesión con AWS Cognito para eliminar productos.');
+      alert('Acción no autorizada: Debes iniciar sesión con AWS Cognito para eliminar productos.');
       return;
     }
 
@@ -69,7 +72,11 @@ export function App() {
 
   return (
     <div className="app-layout">
-      <Navbar itemCount={products.length} />
+      <Navbar 
+        itemCount={products.length} 
+        paginaActual={pagina}
+        onCambiarPagina={setPagina}
+      />
 
       <main className="main-content">
         {errorMessage && (
@@ -79,25 +86,112 @@ export function App() {
           </div>
         )}
 
-        <div className="content-grid">
-          <section className="column-form">
-            <ProductForm onProductCreated={handleCreateProduct} />
-          </section>
+        {/* 1. Vista de Bienvenida (Inicio / Home) */}
+        {pagina === 'inicio' && (
+          <section className="home-welcome">
+            <span className="home-badge">CloudStore — AWS Cognito</span>
+            <h1 className="home-title">Bienvenido a Nuestra Tienda</h1>
+            <p className="home-subtitle">
+              Plataforma conectada a backend en la nube con autenticación segura.
+              Explora nuestros productos o ingresa a gestionar el inventario.
+            </p>
 
-          <section className="column-list">
-            <div className="list-header">
-              <h3>Catálogo de Productos Persistidos</h3>
-              <button onClick={fetchProducts} className="btn-refresh" title="Recargar">
+            <div className="home-actions">
+              <button 
+                className="btn-enter-store" 
+                onClick={() => setPagina('tienda')}
+              >
+                Explorar Tienda ({products.length} productos)
+              </button>
+
+              {!auth.isAuthenticated ? (
+                <button 
+                  className="btn-cognito-home" 
+                  onClick={() => auth.signinRedirect()}
+                >
+                  Iniciar Sesión con Cognito
+                </button>
+              ) : (
+                <div className="home-user-badge">
+                  <span>Conectado: <strong>{auth.user?.profile.email || auth.user?.profile.sub}</strong></span>
+                  <button 
+                    className="btn-primary-small"
+                    onClick={() => setPagina('inventario')}
+                  >
+                    Ir al Inventario
+                  </button>
+                  <button 
+                    className="btn-logout" 
+                    onClick={() => auth.removeUser()}
+                  >
+                    Cerrar sesión
+                  </button>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* 2. Vista Pública de Tienda (Catálogo de Productos) */}
+        {pagina === 'tienda' && (
+          <section className="store-page">
+            <div className="store-header">
+              <div>
+                <h1 className="store-title">Catálogo de Productos</h1>
+                <p className="store-subtitle">
+                  Explora todos los artículos disponibles en nuestra tienda en la nube
+                </p>
+              </div>
+              <button onClick={fetchProducts} className="btn-refresh" title="Recargar catálogo">
                 ↻ Refrescar
               </button>
             </div>
+
             <ProductList
               products={products}
               isLoading={isLoading}
-              onDelete={handleDeleteProduct}
             />
           </section>
-        </div>
+        )}
+
+        {/* 3. Vista de Administración de Inventario (Solo con cuenta logueada) */}
+        {pagina === 'inventario' && (
+          !auth.isAuthenticated ? (
+            <section className="admin-lock-card">
+              <h2 className="lock-title">Acceso Restringido a Administradores</h2>
+              <p className="lock-description">
+                La sección de <strong>Administrar Inventario</strong> permite dar de alta y eliminar artículos. 
+                Para acceder a estas herramientas debes iniciar sesión previamente con tu cuenta de <strong>AWS Cognito</strong>.
+              </p>
+              <button 
+                className="btn-cognito-home" 
+                onClick={() => auth.signinRedirect()}
+              >
+                Iniciar Sesión con Cognito
+              </button>
+            </section>
+          ) : (
+            <div className="content-grid">
+              <section className="column-form">
+                <ProductForm onProductCreated={handleCreateProduct} />
+              </section>
+
+              <section className="column-list">
+                <div className="list-header">
+                  <h3>Inventario de Productos Persistidos</h3>
+                  <button onClick={fetchProducts} className="btn-refresh" title="Recargar">
+                    ↻ Refrescar
+                  </button>
+                </div>
+                <ProductList
+                  products={products}
+                  isLoading={isLoading}
+                  onDelete={handleDeleteProduct}
+                />
+              </section>
+            </div>
+          )
+        )}
       </main>
     </div>
   );

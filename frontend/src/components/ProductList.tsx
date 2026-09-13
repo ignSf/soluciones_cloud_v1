@@ -5,7 +5,7 @@ import { ProductCard } from './ProductCard';
 interface ProductListProps {
   products: Product[];
   isLoading: boolean;
-  onDelete: (id: number) => void;
+  onDelete?: (id: number) => void;
 }
 
 export const ProductList: React.FC<ProductListProps> = ({ products, isLoading, onDelete }) => {

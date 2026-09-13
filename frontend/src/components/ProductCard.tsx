@@ -3,7 +3,7 @@ import type { Product } from '../types/product';
 
 interface ProductCardProps {
   product: Product;
-  onDelete: (id: number) => void;
+  onDelete?: (id: number) => void;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product, onDelete }) => {
@@ -17,7 +17,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onDelete }) =
       <p className="product-desc">{product.description}</p>
       <div className="card-footer">
         <span className="product-id">ID: #{product.id}</span>
-        {product.id && (
+        {onDelete && product.id && (
           <button
             className="btn-delete"
             onClick={() => onDelete(product.id!)}

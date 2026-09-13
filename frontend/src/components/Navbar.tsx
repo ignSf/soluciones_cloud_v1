@@ -3,9 +3,11 @@ import { useAuth } from 'react-oidc-context';
 
 interface NavbarProps {
   itemCount: number;
+  paginaActual: 'inicio' | 'tienda' | 'inventario';
+  onCambiarPagina: (pagina: 'inicio' | 'tienda' | 'inventario') => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ itemCount }) => {
+export const Navbar: React.FC<NavbarProps> = ({ itemCount, paginaActual, onCambiarPagina }) => {
   const auth = useAuth();
 
   const handleSignOut = () => {
@@ -16,10 +18,32 @@ export const Navbar: React.FC<NavbarProps> = ({ itemCount }) => {
   return (
     <header className="navbar">
       <div className="navbar-container">
-        <div className="navbar-brand">
-          <span className="brand-badge">AWS Cognito IDaaS</span>
-          <h2>Panel de Gestión de Productos</h2>
+        <div className="navbar-brand" onClick={() => onCambiarPagina('inicio')} style={{ cursor: 'pointer' }}>
+          <span className="brand-badge">CloudStore</span>
+          <h2>Tienda Online</h2>
         </div>
+
+        <nav className="navbar-nav">
+          <button 
+            className={`nav-btn ${paginaActual === 'inicio' ? 'active' : ''}`}
+            onClick={() => onCambiarPagina('inicio')}
+          >
+            Inicio
+          </button>
+          <button 
+            className={`nav-btn ${paginaActual === 'tienda' ? 'active' : ''}`}
+            onClick={() => onCambiarPagina('tienda')}
+          >
+            Tienda
+          </button>
+          <button 
+            className={`nav-btn ${paginaActual === 'inventario' ? 'active' : ''}`}
+            onClick={() => onCambiarPagina('inventario')}
+            title={auth.isAuthenticated ? "Gestionar catálogo de productos" : "Requiere iniciar sesión"}
+          >
+            Administrar Inventario
+          </button>
+        </nav>
 
         <div className="navbar-actions">
           <div className="navbar-status">
@@ -32,7 +56,7 @@ export const Navbar: React.FC<NavbarProps> = ({ itemCount }) => {
           ) : auth.isAuthenticated ? (
             <div className="user-profile">
               <span className="user-badge" title="Usuario autenticado por AWS Cognito">
-                👤 {auth.user?.profile.email || auth.user?.profile.sub || 'Usuario'}
+                {auth.user?.profile.email || auth.user?.profile.sub || 'Usuario'}
               </span>
               <button onClick={handleSignOut} className="btn-logout" title="Cerrar sesión">
                 Cerrar sesión
