@@ -98,8 +98,13 @@ export function useAuth() {
       }
     : undefined;
 
-  const signinMicrosoft = () => {
-    return msalInstance.loginRedirect(loginRequest);
+  const signinMicrosoft = async () => {
+    try {
+      await msalInstance.loginRedirect(loginRequest);
+    } catch (err: any) {
+      console.error('Error al iniciar sesión con Microsoft Entra ID:', err);
+      alert(`Error al conectar con Microsoft Entra ID: ${err?.message || err}`);
+    }
   };
 
   const signinCognito = () => {
