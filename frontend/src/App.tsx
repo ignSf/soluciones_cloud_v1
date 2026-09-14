@@ -5,6 +5,7 @@ import { productService } from './services/productService';
 import { Navbar } from './components/Navbar';
 import { ProductList } from './components/ProductList';
 import { ProductForm } from './components/ProductForm';
+import homeHeroImage from './assets/homeimages/a986aeff2791fbfabf09587cc419fd03.jpg';
 import './index.css';
 
 export function App() {
@@ -89,45 +90,51 @@ export function App() {
         {/* 1. Vista de Bienvenida (Inicio / Home) */}
         {pagina === 'inicio' && (
           <section className="home-welcome">
-            <span className="home-badge">CloudStore — AWS Cognito</span>
-            <h1 className="home-title">Bienvenido a Nuestra Tienda</h1>
-            <p className="home-subtitle">
-              Plataforma conectada a backend en la nube con autenticación segura.
-              Explora nuestros productos o ingresa a gestionar el inventario.
-            </p>
+            <div className="home-content">
+              <span className="home-badge">CloudStore — AWS Cognito</span>
+              <h1 className="home-title">Bienvenido a Nuestra Tienda</h1>
+              <p className="home-subtitle">
+                Plataforma conectada a backend en la nube con autenticación segura.
+                Explora nuestros productos o ingresa a gestionar el inventario.
+              </p>
 
-            <div className="home-actions">
-              <button 
-                className="btn-enter-store" 
-                onClick={() => setPagina('tienda')}
-              >
-                Explorar Tienda ({products.length} productos)
-              </button>
-
-              {!auth.isAuthenticated ? (
+              <div className="home-actions">
                 <button 
-                  className="btn-cognito-home" 
-                  onClick={() => auth.signinRedirect()}
+                  className="btn-enter-store" 
+                  onClick={() => setPagina('tienda')}
                 >
-                  Iniciar Sesión con Cognito
+                  Explorar Tienda ({products.length} productos)
                 </button>
-              ) : (
-                <div className="home-user-badge">
-                  <span>Conectado: <strong>{auth.user?.profile.email || auth.user?.profile.sub}</strong></span>
+
+                {!auth.isAuthenticated ? (
                   <button 
-                    className="btn-primary-small"
-                    onClick={() => setPagina('inventario')}
+                    className="btn-cognito-home" 
+                    onClick={() => auth.signinRedirect()}
                   >
-                    Ir al Inventario
+                    Iniciar Sesión con Cognito
                   </button>
-                  <button 
-                    className="btn-logout" 
-                    onClick={() => auth.removeUser()}
-                  >
-                    Cerrar sesión
-                  </button>
-                </div>
-              )}
+                ) : (
+                  <div className="home-user-badge">
+                    <span>Conectado: <strong>{auth.user?.profile.email || auth.user?.profile.sub}</strong></span>
+                    <button 
+                      className="btn-primary-small"
+                      onClick={() => setPagina('inventario')}
+                    >
+                      Ir al Inventario
+                    </button>
+                    <button 
+                      className="btn-logout" 
+                      onClick={() => auth.removeUser()}
+                    >
+                      Cerrar sesión
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="home-image-container">
+              <img src={homeHeroImage} alt="Personaje Tienda" className="home-hero-img" />
             </div>
           </section>
         )}
