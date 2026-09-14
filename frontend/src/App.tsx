@@ -44,7 +44,7 @@ export function App() {
 
   const handleCreateProduct = async (newProduct: Product) => {
     if (!auth.isAuthenticated) {
-      alert('Acción no autorizada: Debes iniciar sesión con Microsoft Entra ID en el botón superior para crear productos.');
+      alert('Acción no autorizada: Debes iniciar sesión con Microsoft Entra ID o AWS Cognito para crear productos.');
       return;
     }
 
@@ -59,7 +59,7 @@ export function App() {
 
   const handleDeleteProduct = async (id: number) => {
     if (!auth.isAuthenticated) {
-      alert('Acción no autorizada: Debes iniciar sesión con Microsoft Entra ID para eliminar productos.');
+      alert('Acción no autorizada: Debes iniciar sesión con Microsoft Entra ID o AWS Cognito para eliminar productos.');
       return;
     }
 
@@ -96,7 +96,7 @@ export function App() {
         {pagina === 'inicio' && (
           <div className="home-hero-container">
             <section className="home-welcome">
-              <span className="home-badge">CloudStore — Microsoft Entra ID</span>
+              <span className="home-badge">CloudStore — Microsoft Entra ID & AWS Cognito</span>
               <h1 className="home-title">Bienvenido a Nuestra Tienda</h1>
               <p className="home-subtitle">
                 Plataforma conectada a backend en la nube con autenticación segura.
@@ -112,15 +112,27 @@ export function App() {
                 </button>
 
                 {!auth.isAuthenticated ? (
-                  <button 
-                    className="btn-cognito-home" 
-                    onClick={() => auth.signinRedirect()}
-                  >
-                    Iniciar Sesión con Microsoft
-                  </button>
+                  <div className="home-auth-buttons">
+                    <button 
+                      className="btn-login-ms-home" 
+                      onClick={() => auth.signinMicrosoft()}
+                      title="Iniciar sesión mediante Microsoft Entra ID"
+                    >
+                      Iniciar Sesión con Microsoft
+                    </button>
+                    <button 
+                      className="btn-cognito-home" 
+                      onClick={() => auth.signinCognito()}
+                      title="Iniciar sesión mediante AWS Cognito"
+                    >
+                      Iniciar Sesión con Cognito
+                    </button>
+                  </div>
                 ) : (
                   <div className="home-user-badge">
-                    <span>Conectado: <strong>{auth.user?.profile.email || auth.user?.profile.sub}</strong></span>
+                    <span>
+                      Conectado ({auth.providerName}): <strong>{auth.user?.profile.email || auth.user?.profile.sub}</strong>
+                    </span>
                     {auth.isAdmin && (
                       <button 
                         className="btn-primary-small"
@@ -182,14 +194,22 @@ export function App() {
               <h2 className="lock-title">Acceso Restringido a Administradores</h2>
               <p className="lock-description">
                 La sección de <strong>Administrar Inventario</strong> permite dar de alta y eliminar artículos. 
-                Para acceder a estas herramientas debes iniciar sesión previamente con tu cuenta de <strong>Microsoft Entra ID</strong>.
+                Para acceder a estas herramientas debes iniciar sesión previamente con tu cuenta de <strong>Microsoft Entra ID</strong> o <strong>AWS Cognito</strong>.
               </p>
-              <button 
-                className="btn-cognito-home" 
-                onClick={() => auth.signinRedirect()}
-              >
-                Iniciar Sesión con Microsoft
-              </button>
+              <div className="lock-auth-buttons">
+                <button 
+                  className="btn-login-ms-home" 
+                  onClick={() => auth.signinMicrosoft()}
+                >
+                  Iniciar Sesión con Microsoft
+                </button>
+                <button 
+                  className="btn-cognito-home" 
+                  onClick={() => auth.signinCognito()}
+                >
+                  Iniciar Sesión con Cognito
+                </button>
+              </div>
             </section>
           ) : (
             <div className="content-grid">

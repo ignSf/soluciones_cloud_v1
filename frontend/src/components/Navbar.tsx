@@ -57,24 +57,36 @@ export const Navbar: React.FC<NavbarProps> = ({ itemCount, paginaActual, onCambi
             <span className="auth-loading">Verificando sesión...</span>
           ) : auth.isAuthenticated ? (
             <div className="user-profile">
-              <span className="user-badge" title="Usuario autenticado por Microsoft Entra ID">
+              <span className="user-badge" title={`Usuario autenticado por ${auth.providerName}`}>
                 {auth.user?.profile.email || auth.user?.profile.sub || 'Usuario'}
+                <small style={{ display: 'block', fontSize: '0.75rem', opacity: 0.8 }}>({auth.providerName})</small>
               </span>
               <button onClick={handleSignOut} className="btn-logout" title="Cerrar sesión">
                 Cerrar sesión
               </button>
             </div>
           ) : (
-            <button
-              onClick={() => auth.signinRedirect()}
-              className="btn-login"
-              title="Iniciar sesión mediante Microsoft Entra ID"
-            >
-              Iniciar sesión con Microsoft
-            </button>
+            <div className="navbar-auth-buttons">
+              <button
+                onClick={() => auth.signinMicrosoft()}
+                className="btn-login btn-login-ms"
+                title="Iniciar sesión mediante Microsoft Entra ID"
+              >
+                Iniciar sesión con Microsoft
+              </button>
+              <button
+                onClick={() => auth.signinCognito()}
+                className="btn-login btn-login-cognito"
+                title="Iniciar sesión mediante AWS Cognito"
+              >
+                Iniciar sesión con Cognito
+              </button>
+            </div>
           )}
         </div>
       </div>
     </header>
   );
 };
+
+export default Navbar;
