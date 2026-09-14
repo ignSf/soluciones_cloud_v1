@@ -421,8 +421,11 @@ h1, h2, h3, .home-title, .form-title {
   15% {
     opacity: 0.92;
   }
-  85% {
+  50% {
     opacity: 0.92;
+  }
+  70% {
+    opacity: 0;
   }
   100% {
     transform: translateX(-420px) translateY(-10px);
@@ -438,8 +441,11 @@ h1, h2, h3, .home-title, .form-title {
   18% {
     opacity: 0.88;
   }
-  82% {
+  52% {
     opacity: 0.88;
+  }
+  72% {
+    opacity: 0;
   }
   100% {
     transform: translateX(-440px) translateY(8px);
