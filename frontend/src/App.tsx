@@ -114,12 +114,14 @@ export function App() {
               ) : (
                 <div className="home-user-badge">
                   <span>Conectado: <strong>{auth.user?.profile.email || auth.user?.profile.sub}</strong></span>
-                  <button 
-                    className="btn-primary-small"
-                    onClick={() => setPagina('inventario')}
-                  >
-                    Ir al Inventario
-                  </button>
+                  {auth.isAdmin && (
+                    <button 
+                      className="btn-primary-small"
+                      onClick={() => setPagina('inventario')}
+                    >
+                      Ir al Inventario
+                    </button>
+                  )}
                   <button 
                     className="btn-logout" 
                     onClick={() => auth.removeUser()}

@@ -36,13 +36,15 @@ export const Navbar: React.FC<NavbarProps> = ({ itemCount, paginaActual, onCambi
           >
             Tienda
           </button>
-          <button 
-            className={`nav-btn ${paginaActual === 'inventario' ? 'active' : ''}`}
-            onClick={() => onCambiarPagina('inventario')}
-            title={auth.isAuthenticated ? "Gestionar catálogo de productos" : "Requiere iniciar sesión"}
-          >
-            Administrar Inventario
-          </button>
+          {auth.isAdmin && (
+            <button 
+              className={`nav-btn ${paginaActual === 'inventario' ? 'active' : ''}`}
+              onClick={() => onCambiarPagina('inventario')}
+              title="Gestionar catálogo de productos"
+            >
+              Administrar Inventario
+            </button>
+          )}
         </nav>
 
         <div className="navbar-actions">

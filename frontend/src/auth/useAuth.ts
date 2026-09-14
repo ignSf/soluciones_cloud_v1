@@ -35,6 +35,8 @@ export function useAuth() {
   return {
     isLoading: inProgress !== 'none',
     isAuthenticated,
+    roles: (account?.idTokenClaims?.roles as string[]) ?? [],
+    isAdmin: ((account?.idTokenClaims?.roles as string[]) ?? []).includes('Admin'),
     user: account
       ? {
           profile: { email: account.username, sub: account.localAccountId },
