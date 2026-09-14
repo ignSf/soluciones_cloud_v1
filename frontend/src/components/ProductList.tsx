@@ -6,9 +6,10 @@ interface ProductListProps {
   products: Product[];
   isLoading: boolean;
   onDelete?: (id: number) => void;
+  onBuy?: (product: Product) => void;
 }
 
-export const ProductList: React.FC<ProductListProps> = ({ products, isLoading, onDelete }) => {
+export const ProductList: React.FC<ProductListProps> = ({ products, isLoading, onDelete, onBuy }) => {
   if (isLoading) {
     return <div className="loading-state">Cargando datos desde la API...</div>;
   }
@@ -25,7 +26,7 @@ export const ProductList: React.FC<ProductListProps> = ({ products, isLoading, o
   return (
     <div className="product-grid">
       {products.map((product) => (
-        <ProductCard key={product.id} product={product} onDelete={onDelete} />
+        <ProductCard key={product.id} product={product} onDelete={onDelete} onBuy={onBuy} />
       ))}
     </div>
   );

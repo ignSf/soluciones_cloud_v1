@@ -3,8 +3,8 @@ import { useAuth } from '../auth/useAuth';
 
 interface NavbarProps {
   itemCount: number;
-  paginaActual: 'inicio' | 'tienda' | 'inventario';
-  onCambiarPagina: (pagina: 'inicio' | 'tienda' | 'inventario') => void;
+  paginaActual: 'inicio' | 'tienda' | 'inventario' | 'pedidos';
+  onCambiarPagina: (pagina: 'inicio' | 'tienda' | 'inventario' | 'pedidos') => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ itemCount, paginaActual, onCambiarPagina }) => {
@@ -36,6 +36,15 @@ export const Navbar: React.FC<NavbarProps> = ({ itemCount, paginaActual, onCambi
           >
             Tienda
           </button>
+          {auth.isAuthenticated && (
+            <button 
+              className={`nav-btn ${paginaActual === 'pedidos' ? 'active' : ''}`}
+              onClick={() => onCambiarPagina('pedidos')}
+              title="Consultar historial de pedidos"
+            >
+              Mis Pedidos
+            </button>
+          )}
           {auth.isAdmin && (
             <button 
               className={`nav-btn ${paginaActual === 'inventario' ? 'active' : ''}`}

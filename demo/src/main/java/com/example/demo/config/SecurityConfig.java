@@ -51,6 +51,9 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/products/**").hasRole("Admin")
                 .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("Admin")
 
+                // Gestión de Órdenes / Pedidos: Requiere usuario autenticado (Cognito o Entra ID)
+                .requestMatchers("/api/orders/**").authenticated()
+
                 // Cualquier otra petición debe estar autenticada
                 .anyRequest().authenticated()
             )

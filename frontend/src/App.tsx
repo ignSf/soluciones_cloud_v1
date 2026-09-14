@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from './auth/useAuth';
 import type { Product } from './types/product';
+import type { Order } from './types/order';
 import { productService } from './services/productService';
+import { orderService } from './services/orderService';
 import { Navbar } from './components/Navbar';
 import { ProductList } from './components/ProductList';
 import { ProductForm } from './components/ProductForm';
@@ -16,11 +18,14 @@ import './index.css';
 export function App() {
   const auth = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoadingOrders, setIsLoadingOrders] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [orderSuccessMessage, setOrderSuccessMessage] = useState<string | null>(null);
 
-  // Control de pantalla: 'inicio' | 'tienda' | 'inventario'
-  const [pagina, setPagina] = useState<'inicio' | 'tienda' | 'inventario'>('inicio');
+  // Control de pantalla: 'inicio' | 'tienda' | 'inventario' | 'pedidos'
+  const [pagina, setPagina] = useState<'inicio' | 'tienda' | 'inventario' | 'pedidos'>('inicio');
 
   // El access_token es el que autoriza contra la API; el id_token queda en el front
   const userToken = auth.user?.access_token;
@@ -38,9 +43,28 @@ export function App() {
     }
   };
 
+  const fetchOrders = async () => {
+    if (!auth.isAuthenticated || !userToken) return;
+    try {
+      setIsLoadingOrders(true);
+      const data = await orderService.getMyOrders(userToken);
+      setOrders(data);
+    } catch (err: any) {
+      console.warn('Aviso al consultar órdenes:', err);
+    } finally {
+      setIsLoadingOrders(false);
+    }
+  };
+
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    if (pagina === 'pedidos' && auth.isAuthenticated) {
+      fetchOrders();
+    }
+  }, [pagina, auth.isAuthenticated, userToken]);
 
   const handleCreateProduct = async (newProduct: Product) => {
     if (!auth.isAuthenticated) {
@@ -76,6 +100,35 @@ export function App() {
     }
   };
 
+  const handleBuyProduct = async (product: Product) => {
+    if (!auth.isAuthenticated) {
+      alert('Para realizar un pedido en la tienda, primero debes iniciar sesión con Microsoft Entra ID o AWS Cognito.');
+      return;
+    }
+
+    if (!window.confirm(`¿Deseas confirmar la compra de "${product.name}" por $${product.price?.toFixed(2)}?`)) {
+      return;
+    }
+
+    try {
+      const newOrder: Order = {
+        productId: product.id!,
+        productName: product.name,
+        quantity: 1,
+        unitPrice: product.price,
+        totalAmount: product.price,
+        status: 'CONFIRMED',
+      };
+      const created = await orderService.create(newOrder, userToken);
+      setOrders((prev) => [created, ...prev]);
+      setOrderSuccessMessage(`¡Pedido #${created.id ?? ''} generado con éxito para ${product.name}! Puedes revisarlo en la pestaña "Mis Pedidos".`);
+      setTimeout(() => setOrderSuccessMessage(null), 6000);
+    } catch (err: any) {
+      alert(err.message || 'Error al procesar la compra en el microservicio de órdenes');
+      console.error(err);
+    }
+  };
+
   return (
     <div className="app-layout">
       <Navbar 
@@ -92,15 +145,21 @@ export function App() {
           </div>
         )}
 
+        {orderSuccessMessage && (
+          <div className="success-banner">
+            <p><strong>Pedido Confirmado:</strong> {orderSuccessMessage}</p>
+            <button onClick={() => setPagina('pedidos')} className="btn-success-action">Ver Mis Pedidos</button>
+          </div>
+        )}
+
         {/* 1. Vista de Bienvenida (Inicio / Home) */}
         {pagina === 'inicio' && (
           <div className="home-hero-container">
             <section className="home-welcome">
-              <span className="home-badge">CloudStore — Microsoft Entra ID & AWS Cognito</span>
+              <span className="home-badge">CloudStore — Microservicios en la Nube</span>
               <h1 className="home-title">Bienvenido a Nuestra Tienda</h1>
               <p className="home-subtitle">
-                Plataforma conectada a backend en la nube con autenticación segura.
-                Explora nuestros productos o ingresa a gestionar el inventario.
+                Plataforma desacoplada con microservicio de catálogo, microservicio de órdenes y autenticación multi-cloud con AWS Cognito y Microsoft Entra ID.
               </p>
 
               <div className="home-actions">
@@ -133,6 +192,12 @@ export function App() {
                     <span>
                       Conectado ({auth.providerName}): <strong>{auth.user?.profile.email || auth.user?.profile.sub}</strong>
                     </span>
+                    <button 
+                      className="btn-primary-small"
+                      onClick={() => setPagina('pedidos')}
+                    >
+                      Mis Pedidos
+                    </button>
                     {auth.isAdmin && (
                       <button 
                         className="btn-primary-small"
@@ -172,7 +237,7 @@ export function App() {
               <div>
                 <h1 className="store-title">Catálogo de Productos</h1>
                 <p className="store-subtitle">
-                  Explora todos los artículos disponibles en nuestra tienda en la nube
+                  Explora nuestros artículos y haz clic en "Comprar" para generar un pedido con tu cuenta
                 </p>
               </div>
               <button onClick={fetchProducts} className="btn-refresh" title="Recargar catálogo">
@@ -183,11 +248,94 @@ export function App() {
             <ProductList
               products={products}
               isLoading={isLoading}
+              onBuy={handleBuyProduct}
             />
           </section>
         )}
 
-        {/* 3. Vista de Administración de Inventario (Solo con cuenta logueada) */}
+        {/* 3. Vista de Mis Pedidos (Historial del Usuario Autenticado) */}
+        {pagina === 'pedidos' && (
+          !auth.isAuthenticated ? (
+            <section className="admin-lock-card">
+              <h2 className="lock-title">Historial de Pedidos Protegido</h2>
+              <p className="lock-description">
+                Para consultar tus compras o realizar pedidos en la tienda, debes iniciar sesión previamente con tu cuenta de <strong>Microsoft Entra ID</strong> o <strong>AWS Cognito</strong>.
+              </p>
+              <div className="lock-auth-buttons">
+                <button 
+                  className="btn-login-ms-home" 
+                  onClick={() => auth.signinMicrosoft()}
+                >
+                  Iniciar Sesión con Microsoft
+                </button>
+                <button 
+                  className="btn-cognito-home" 
+                  onClick={() => auth.signinCognito()}
+                >
+                  Iniciar Sesión con Cognito
+                </button>
+              </div>
+            </section>
+          ) : (
+            <section className="orders-page">
+              <div className="orders-header">
+                <div>
+                  <h1 className="orders-title">Mis Pedidos</h1>
+                  <p className="orders-subtitle">
+                    Compras registradas en el microservicio de órdenes para: <strong>{auth.user?.profile.email || auth.user?.profile.sub}</strong>
+                  </p>
+                </div>
+                <div className="orders-header-actions">
+                  <button onClick={() => setPagina('tienda')} className="btn-enter-store-small">
+                    + Comprar Más Artículos
+                  </button>
+                  <button onClick={fetchOrders} className="btn-refresh" title="Recargar pedidos">
+                    ↻ Refrescar
+                  </button>
+                </div>
+              </div>
+
+              {isLoadingOrders ? (
+                <div className="loading-state">Cargando pedidos desde el microservicio...</div>
+              ) : orders.length === 0 ? (
+                <div className="empty-state">
+                  <p>Aún no has registrado pedidos con esta cuenta.</p>
+                  <span>Visita la Tienda y haz clic en "Comprar" en cualquiera de los productos disponibles.</span>
+                  <button onClick={() => setPagina('tienda')} className="btn-primary-small" style={{ marginTop: '1rem' }}>
+                    Ir a la Tienda
+                  </button>
+                </div>
+              ) : (
+                <div className="orders-grid">
+                  {orders.map((order) => (
+                    <div key={order.id} className="order-card">
+                      <div className="order-card-header">
+                        <span className="order-id">Orden #{order.id}</span>
+                        <span className="order-status-badge">
+                          {order.status || 'CONFIRMADO'}
+                        </span>
+                      </div>
+                      <h3 className="order-product-title">{order.productName || `Producto #${order.productId}`}</h3>
+                      <div className="order-meta-info">
+                        <p>Cantidad: <strong>{order.quantity || 1}</strong></p>
+                        <p>Precio Unitario: <strong>${order.unitPrice?.toFixed(2)}</strong></p>
+                        <p className="order-total-price">Total: <strong>${order.totalAmount?.toFixed(2)}</strong></p>
+                      </div>
+                      <div className="order-footer">
+                        <span className="order-date">
+                          {order.createdAt ? new Date(order.createdAt).toLocaleString('es-CL') : 'Recién creada'}
+                        </span>
+                        <span className="order-provider-tag">{auth.providerName}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+          )
+        )}
+
+        {/* 4. Vista de Administración de Inventario (Solo con cuenta logueada y rol Admin) */}
         {pagina === 'inventario' && (
           !auth.isAuthenticated ? (
             <section className="admin-lock-card">
