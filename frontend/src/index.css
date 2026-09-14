@@ -253,10 +253,10 @@ h1, h2, h3, .home-title, .form-title {
 /* Pantalla de Inicio / Bienvenida (Home) */
 .home-hero-container {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  gap: 3.5rem;
-  max-width: 1180px;
+  gap: 3rem;
+  max-width: 1220px;
   margin: 2.5rem auto;
   position: relative;
 }
@@ -318,7 +318,7 @@ h1, h2, h3, .home-title, .form-title {
 }
 
 .home-character-img {
-  max-height: 640px;
+  max-height: 490px;
   width: auto;
   object-fit: contain;
   filter: drop-shadow(0 15px 25px rgba(42, 34, 27, 0.15));
