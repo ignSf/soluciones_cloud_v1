@@ -256,8 +256,8 @@ h1, h2, h3, .home-title, .form-title {
   align-items: center;
   justify-content: center;
   gap: 3.5rem;
-  max-width: 1100px;
-  margin: 3.5rem auto;
+  max-width: 1180px;
+  margin: 2.5rem auto;
   position: relative;
 }
 
@@ -318,7 +318,7 @@ h1, h2, h3, .home-title, .form-title {
 }
 
 .home-character-img {
-  max-height: 550px;
+  max-height: 640px;
   width: auto;
   object-fit: contain;
   filter: drop-shadow(0 15px 25px rgba(42, 34, 27, 0.15));
