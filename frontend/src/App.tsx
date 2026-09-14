@@ -5,7 +5,7 @@ import { productService } from './services/productService';
 import { Navbar } from './components/Navbar';
 import { ProductList } from './components/ProductList';
 import { ProductForm } from './components/ProductForm';
-import homeHeroImage from './assets/homeimages/a986aeff2791fbfabf09587cc419fd03.jpg';
+import narutoImage from './assets/homeimages/naruto.png';
 import './index.css';
 
 export function App() {
@@ -89,8 +89,8 @@ export function App() {
 
         {/* 1. Vista de Bienvenida (Inicio / Home) */}
         {pagina === 'inicio' && (
-          <section className="home-welcome">
-            <div className="home-content">
+          <div className="home-hero-container">
+            <section className="home-welcome">
               <span className="home-badge">CloudStore — AWS Cognito</span>
               <h1 className="home-title">Bienvenido a Nuestra Tienda</h1>
               <p className="home-subtitle">
@@ -131,12 +131,12 @@ export function App() {
                   </div>
                 )}
               </div>
-            </div>
+            </section>
 
-            <div className="home-image-container">
-              <img src={homeHeroImage} alt="Personaje Tienda" className="home-hero-img" />
+            <div className="home-character-wrapper">
+              <img src={narutoImage} alt="Naruto" className="home-character-img" />
             </div>
-          </section>
+          </div>
         )}
 
         {/* 2. Vista Pública de Tienda (Catálogo de Productos) */}

@@ -251,23 +251,25 @@ h1, h2, h3, .home-title, .form-title {
 }
 
 /* Pantalla de Inicio / Bienvenida (Home) */
-.home-welcome {
+.home-hero-container {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 2.5rem;
-  max-width: 920px;
+  justify-content: center;
+  gap: 3.5rem;
+  max-width: 1100px;
   margin: 3.5rem auto;
-  padding: 3rem 2.5rem;
+  position: relative;
+}
+
+.home-welcome {
+  flex: 1;
+  max-width: 620px;
+  padding: 3.5rem 3rem;
   background-color: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 16px;
   box-shadow: 0 10px 30px -5px rgba(70, 50, 30, 0.06);
   text-align: left;
-}
-
-.home-content {
-  flex: 1;
 }
 
 .home-badge {
@@ -285,11 +287,12 @@ h1, h2, h3, .home-title, .form-title {
 }
 
 .home-title {
-  font-size: 2.3rem;
+  font-size: 2.4rem;
   font-weight: 700;
   margin-bottom: 1rem;
   color: var(--text-main);
   letter-spacing: -0.01em;
+  line-height: 1.2;
 }
 
 .home-subtitle {
@@ -307,36 +310,41 @@ h1, h2, h3, .home-title, .form-title {
   flex-wrap: wrap;
 }
 
-.home-image-container {
+.home-character-wrapper {
   flex-shrink: 0;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
 }
 
-.home-hero-img {
-  max-height: 360px;
+.home-character-img {
+  max-height: 480px;
   width: auto;
   object-fit: contain;
-  filter: drop-shadow(0 10px 15px rgba(70, 50, 30, 0.1));
+  filter: drop-shadow(0 15px 25px rgba(42, 34, 27, 0.15));
   transition: transform 0.3s ease;
+  user-select: none;
 }
 
-.home-hero-img:hover {
-  transform: translateY(-4px) scale(1.02);
+.home-character-img:hover {
+  transform: translateY(-6px) scale(1.02);
 }
 
-@media (max-width: 800px) {
+@media (max-width: 960px) {
+  .home-hero-container {
+    flex-direction: column;
+    gap: 2.5rem;
+    align-items: center;
+  }
   .home-welcome {
-    flex-direction: column-reverse;
+    max-width: 100%;
     text-align: center;
-    padding: 2.5rem 1.5rem;
   }
   .home-actions {
     justify-content: center;
   }
-  .home-hero-img {
-    max-height: 250px;
+  .home-character-img {
+    max-height: 350px;
   }
 }
 
