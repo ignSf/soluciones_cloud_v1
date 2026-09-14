@@ -42,6 +42,7 @@ body {
   color: var(--text-main);
   font-family: var(--font-family);
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 /* Forzar herencia de fuente en botones y campos de formulario */
@@ -348,19 +349,23 @@ h1, h2, h3, .home-title, .form-title {
   pointer-events: none;
 }
 
+/* Nube base anclada con respiración orgánica */
 .cloud-main-bottom {
   bottom: -15px;
   left: 50%;
   transform: translateX(-48%);
   width: 440px;
   z-index: 3;
+  animation: cloudBreathe 6s ease-in-out infinite alternate;
 }
 
+/* Acentos laterales con suave balanceo */
 .cloud-accent-left {
   bottom: 30px;
   left: -30px;
   width: 220px;
   z-index: 4;
+  animation: cloudDriftLeft 7.5s ease-in-out infinite alternate;
 }
 
 .cloud-accent-right {
@@ -368,6 +373,78 @@ h1, h2, h3, .home-title, .form-title {
   right: -25px;
   width: 260px;
   z-index: 5;
+  animation: cloudDriftRight 8.5s ease-in-out infinite alternate;
+}
+
+/* Nubes dinámicas pasando en loop */
+.cloud-dynamic-pass-1 {
+  bottom: 12px;
+  left: 20px;
+  width: 280px;
+  z-index: 6;
+  animation: cloudGlideAcross1 18s linear infinite;
+}
+
+.cloud-dynamic-pass-2 {
+  bottom: -20px;
+  left: 10px;
+  width: 320px;
+  z-index: 5;
+  animation: cloudGlideAcross2 24s linear infinite;
+  animation-delay: -12s;
+}
+
+/* Keyframes de animación */
+@keyframes cloudBreathe {
+  0% { transform: translateX(-48%) translateY(0px) scale(1); }
+  50% { transform: translateX(-48%) translateY(-6px) scale(1.015); }
+  100% { transform: translateX(-48%) translateY(2px) scale(0.995); }
+}
+
+@keyframes cloudDriftLeft {
+  0% { transform: translateY(0px) translateX(0px) rotate(0deg); }
+  50% { transform: translateY(-8px) translateX(5px) rotate(-1.5deg); }
+  100% { transform: translateY(3px) translateX(-4px) rotate(1deg); }
+}
+
+@keyframes cloudDriftRight {
+  0% { transform: translateY(0px) translateX(0px) rotate(0deg); }
+  50% { transform: translateY(-7px) translateX(-6px) rotate(1.5deg); }
+  100% { transform: translateY(4px) translateX(3px) rotate(-1deg); }
+}
+
+@keyframes cloudGlideAcross1 {
+  0% {
+    transform: translateX(380px) translateY(0px);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.92;
+  }
+  85% {
+    opacity: 0.92;
+  }
+  100% {
+    transform: translateX(-420px) translateY(-10px);
+    opacity: 0;
+  }
+}
+
+@keyframes cloudGlideAcross2 {
+  0% {
+    transform: translateX(400px) translateY(0px);
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.88;
+  }
+  82% {
+    opacity: 0.88;
+  }
+  100% {
+    transform: translateX(-440px) translateY(8px);
+    opacity: 0;
+  }
 }
 
 @media (max-width: 960px) {
