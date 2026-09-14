@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAuth } from 'react-oidc-context';
+import { useAuth } from '../auth/useAuth';
 
 interface NavbarProps {
   itemCount: number;
@@ -55,7 +55,7 @@ export const Navbar: React.FC<NavbarProps> = ({ itemCount, paginaActual, onCambi
             <span className="auth-loading">Verificando sesión...</span>
           ) : auth.isAuthenticated ? (
             <div className="user-profile">
-              <span className="user-badge" title="Usuario autenticado por AWS Cognito">
+              <span className="user-badge" title="Usuario autenticado por Microsoft Entra ID">
                 {auth.user?.profile.email || auth.user?.profile.sub || 'Usuario'}
               </span>
               <button onClick={handleSignOut} className="btn-logout" title="Cerrar sesión">
@@ -66,9 +66,9 @@ export const Navbar: React.FC<NavbarProps> = ({ itemCount, paginaActual, onCambi
             <button
               onClick={() => auth.signinRedirect()}
               className="btn-login"
-              title="Iniciar sesión mediante AWS Cognito"
+              title="Iniciar sesión mediante Microsoft Entra ID"
             >
-              Iniciar sesión con Cognito
+              Iniciar sesión con Microsoft
             </button>
           )}
         </div>
