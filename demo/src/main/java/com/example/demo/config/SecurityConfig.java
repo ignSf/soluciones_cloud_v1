@@ -13,6 +13,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 
 import java.util.List;
 
@@ -46,15 +48,16 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
 
                 // POST y DELETE requieren autenticación obligatoria con JWT
-                .requestMatchers(HttpMethod.POST, "/api/products/**").authenticated()
-                .requestMatchers(HttpMethod.DELETE, "/api/products/**").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/products/**").hasRole("Admin")
+                .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("Admin")
 
                 // Cualquier otra petición debe estar autenticada
                 .anyRequest().authenticated()
             )
 
-            // 5. Autenticación JWT nativa mediante OAuth2 Resource Server
-            .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
+            // 5. Autenticación JWT + lectura de roles desde el claim "roles" de Entra ID
+            .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt ->
+                jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
 
             // 6. Permitir ver la consola H2 en frames
             .headers(headers -> headers
@@ -76,5 +79,16 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+     @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter authorities = new JwtGrantedAuthoritiesConverter();
+        authorities.setAuthoritiesClaimName("roles");
+        authorities.setAuthorityPrefix("ROLE_");
+
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+        converter.setJwtGrantedAuthoritiesConverter(authorities);
+        return converter;
     }
 }
