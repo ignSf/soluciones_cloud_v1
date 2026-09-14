@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from 'react-oidc-context';
+import { useAuth } from './auth/useAuth';
 import type { Product } from './types/product';
 import { productService } from './services/productService';
 import { Navbar } from './components/Navbar';
@@ -22,8 +22,8 @@ export function App() {
   // Control de pantalla: 'inicio' | 'tienda' | 'inventario'
   const [pagina, setPagina] = useState<'inicio' | 'tienda' | 'inventario'>('inicio');
 
-  // Obtener el token JWT del usuario autenticado (id_token contiene claims de usuario y firma RS256)
-  const userToken = auth.user?.id_token ?? auth.user?.access_token;
+  // El access_token es el que autoriza contra la API; el id_token queda en el front
+  const userToken = auth.user?.access_token;
 
   const fetchProducts = async () => {
     try {
@@ -44,7 +44,7 @@ export function App() {
 
   const handleCreateProduct = async (newProduct: Product) => {
     if (!auth.isAuthenticated) {
-      alert('Acción no autorizada: Debes iniciar sesión con AWS Cognito en el botón superior para crear productos.');
+      alert('Acción no autorizada: Debes iniciar sesión con Microsoft Entra ID en el botón superior para crear productos.');
       return;
     }
 
@@ -59,7 +59,7 @@ export function App() {
 
   const handleDeleteProduct = async (id: number) => {
     if (!auth.isAuthenticated) {
-      alert('Acción no autorizada: Debes iniciar sesión con AWS Cognito para eliminar productos.');
+      alert('Acción no autorizada: Debes iniciar sesión con Microsoft Entra ID para eliminar productos.');
       return;
     }
 
@@ -96,7 +96,7 @@ export function App() {
         {pagina === 'inicio' && (
           <div className="home-hero-container">
             <section className="home-welcome">
-              <span className="home-badge">CloudStore — AWS Cognito</span>
+              <span className="home-badge">CloudStore — Microsoft Entra ID</span>
               <h1 className="home-title">Bienvenido a Nuestra Tienda</h1>
               <p className="home-subtitle">
                 Plataforma conectada a backend en la nube con autenticación segura.
@@ -116,17 +116,19 @@ export function App() {
                     className="btn-cognito-home" 
                     onClick={() => auth.signinRedirect()}
                   >
-                    Iniciar Sesión con Cognito
+                    Iniciar Sesión con Microsoft
                   </button>
                 ) : (
                   <div className="home-user-badge">
                     <span>Conectado: <strong>{auth.user?.profile.email || auth.user?.profile.sub}</strong></span>
-                    <button 
-                      className="btn-primary-small"
-                      onClick={() => setPagina('inventario')}
-                    >
-                      Ir al Inventario
-                    </button>
+                    {auth.isAdmin && (
+                      <button 
+                        className="btn-primary-small"
+                        onClick={() => setPagina('inventario')}
+                      >
+                        Ir al Inventario
+                      </button>
+                    )}
                     <button 
                       className="btn-logout" 
                       onClick={() => auth.removeUser()}
@@ -180,13 +182,13 @@ export function App() {
               <h2 className="lock-title">Acceso Restringido a Administradores</h2>
               <p className="lock-description">
                 La sección de <strong>Administrar Inventario</strong> permite dar de alta y eliminar artículos. 
-                Para acceder a estas herramientas debes iniciar sesión previamente con tu cuenta de <strong>AWS Cognito</strong>.
+                Para acceder a estas herramientas debes iniciar sesión previamente con tu cuenta de <strong>Microsoft Entra ID</strong>.
               </p>
               <button 
                 className="btn-cognito-home" 
                 onClick={() => auth.signinRedirect()}
               >
-                Iniciar Sesión con Cognito
+                Iniciar Sesión con Microsoft
               </button>
             </section>
           ) : (

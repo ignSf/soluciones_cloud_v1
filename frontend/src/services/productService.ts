@@ -38,7 +38,7 @@ export const productService = {
 
     if (response.status === 401) {
       const errData = await response.json().catch(() => ({}));
-      throw new Error(errData.error || '401 Unauthorized: Debe iniciar sesión con AWS Cognito para crear productos.');
+      throw new Error(errData.error || '401 Unauthorized: Debe iniciar sesión con Microsoft Entra ID para crear productos.');
     }
 
     if (!response.ok) {
@@ -63,7 +63,7 @@ export const productService = {
     });
 
     if (response.status === 401) {
-      throw new Error('401 Unauthorized: Debe iniciar sesión con AWS Cognito para eliminar productos.');
+      throw new Error('401 Unauthorized: Debe iniciar sesión con Microsoft Entra ID para eliminar productos.');
     }
 
     if (!response.ok) {
