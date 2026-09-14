@@ -315,6 +315,7 @@ h1, h2, h3, .home-title, .form-title {
   display: flex;
   align-items: flex-end;
   justify-content: center;
+  position: relative;
 }
 
 .home-character-img {
@@ -324,6 +325,49 @@ h1, h2, h3, .home-title, .form-title {
   filter: drop-shadow(0 15px 25px rgba(42, 34, 27, 0.15));
   user-select: none;
   pointer-events: none;
+  position: relative;
+  z-index: 1;
+}
+
+/* Nubes Japonesas de Transición en la Cintura */
+.home-clouds-cluster {
+  position: absolute;
+  bottom: -25px;
+  left: -30px;
+  right: -30px;
+  height: 200px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.home-cloud {
+  position: absolute;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 24px rgba(42, 34, 27, 0.15));
+  user-select: none;
+  pointer-events: none;
+}
+
+.cloud-main-bottom {
+  bottom: -15px;
+  left: 50%;
+  transform: translateX(-48%);
+  width: 440px;
+  z-index: 3;
+}
+
+.cloud-accent-left {
+  bottom: 30px;
+  left: -30px;
+  width: 220px;
+  z-index: 4;
+}
+
+.cloud-accent-right {
+  bottom: -25px;
+  right: -25px;
+  width: 260px;
+  z-index: 5;
 }
 
 @media (max-width: 960px) {

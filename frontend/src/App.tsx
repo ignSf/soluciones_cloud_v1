@@ -6,6 +6,9 @@ import { Navbar } from './components/Navbar';
 import { ProductList } from './components/ProductList';
 import { ProductForm } from './components/ProductForm';
 import narutoImage from './assets/homeimages/naruto.png';
+import cloudMain from './assets/homeimages/cloud_6.png';
+import cloudLeft from './assets/homeimages/cloud_4.png';
+import cloudRight from './assets/homeimages/cloud_12.png';
 import './index.css';
 
 export function App() {
@@ -135,6 +138,11 @@ export function App() {
 
             <div className="home-character-wrapper">
               <img src={narutoImage} alt="Naruto" className="home-character-img" />
+              <div className="home-clouds-cluster" aria-hidden="true">
+                <img src={cloudLeft} alt="" className="home-cloud cloud-accent-left" />
+                <img src={cloudMain} alt="" className="home-cloud cloud-main-bottom" />
+                <img src={cloudRight} alt="" className="home-cloud cloud-accent-right" />
+              </div>
             </div>
           </div>
         )}
