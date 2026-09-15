@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soluciones Cloud v1 - Defensa Técnica de Arquitectura</title>
+  <style>
+    :root {
+      --bg: #0b132b;
+      --card-bg: #18223a;
+      --card-alt: #141c30;
+      --border: #304162;
+      --cyan: #00b4d8;
+      --cyan-glow: rgba(0, 180, 216, 0.2);
+      --mint: #06d6a0;
+      --amber: #ffb703;
+      --white: #ffffff;
+      --silver: #e2e8f0;
+      --muted: #94a3b8;
+      --font: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--silver);
+      font-family: var(--font);
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+    }
+
+    /* Barra Superior Tecnológica */
+    .top-bar {
+      height: 4px;
+      width: 100%;
+      background: linear-gradient(90deg, #0077b6, #00b4d8, #06d6a0);
+    }
+
+    .progress-bar-container {
+      height: 3px;
+      background: rgba(255, 255, 255, 0.06);
+      width: 100%;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 10%;
+      background: var(--cyan);
+      box-shadow: 0 0 10px var(--cyan-glow);
+      transition: width 0.3s ease;
+    }
+
+    /* Contenedor Principal */
+    .deck-container {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2.5rem 5rem 5rem 5rem;
+    }
+
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      padding: 2.5rem 5rem 5rem 5rem;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(12px);
+      transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    /* Encabezado de Diapositiva */
+    .slide-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 1rem;
+    }
+
+    .category-badge {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--cyan);
+      background: rgba(0, 180, 216, 0.12);
+      border: 1px solid var(--cyan);
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: 0.5rem;
+    }
+
+    .slide-title {
+      font-size: 2.2rem;
+      color: var(--white);
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .slide-number {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--cyan);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Tarjetas Ejecutivas */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.8rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+      position: relative;
+    }
+
+    .card h3 {
+      font-size: 1.35rem;
+      color: var(--white);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .card p {
+      font-size: 1.05rem;
+      line-height: 1.6;
+      color: var(--silver);
+    }
+
+    .card-cyan h3 { color: var(--cyan); }
+    .card-mint h3 { color: var(--mint); }
+    .card-amber h3 { color: var(--amber); }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      flex: 1;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.8rem;
+      flex: 1;
+    }
+
+    .stack-vertical {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      flex: 1;
+    }
+
+    /* Portada */
+    .hero-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+      max-width: 1100px;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--cyan);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .hero-title {
+      font-size: 4rem;
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1.1;
+      margin-bottom: 1.2rem;
+    }
+
+    .hero-subtitle {
+      font-size: 1.35rem;
+      color: var(--silver);
+      line-height: 1.5;
+      margin-bottom: 2rem;
+      max-width: 900px;
+    }
+
+    .chips-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .chip {
+      background: rgba(16, 36, 68, 0.85);
+      border: 1px solid var(--cyan);
+      color: var(--white);
+      padding: 8px 18px;
+      border-radius: 30px;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .meta-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.2rem 1.8rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .meta-team {
+      font-size: 1.1rem;
+      color: var(--white);
+      font-weight: 600;
+    }
+
+    .meta-env {
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    /* Listas de puntos con respiro */
+    .point-item {
+      margin-bottom: 1.4rem;
+    }
+
+    .point-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .point-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .point-desc {
+      font-size: 1rem;
+      color: var(--silver);
+      line-height: 1.5;
+    }
+
+    /* Barra Inferior de Controles */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 52px;
+      background: rgba(11, 19, 43, 0.95);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 2rem;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+
+    .footer-left {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--silver);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      background: rgba(0, 180, 216, 0.2);
+      border-color: var(--cyan);
+      color: var(--white);
+    }
+
+    .btn-active {
+      background: var(--cyan);
+      color: var(--bg);
+      font-weight: 700;
+    }
+
+    /* Drawer de Notas del Orador */
+    .notes-drawer {
+      position: fixed;
+      bottom: 52px;
+      right: 0;
+      width: 420px;
+      max-height: 480px;
+      background: rgba(16, 24, 46, 0.98);
+      border: 1px solid var(--cyan);
+      border-right: none;
+      border-radius: 12px 0 0 12px;
+      padding: 1.5rem;
+      box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+      z-index: 99;
+      transform: translateX(110%);
+      transition: transform 0.3s ease;
+      overflow-y: auto;
+    }
+
+    .notes-drawer.open {
+      transform: translateX(0);
+    }
+
+    .notes-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 0.6rem;
+    }
+
+    .notes-header h4 {
+      color: var(--cyan);
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .notes-content {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: var(--silver);
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar"></div>
+  <div class="progress-bar-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <main class="deck-container">
+
+    <!-- ==================== DIAPOSITIVA 1: PORTADA ==================== -->
+    <section class="slide active" id="slide-1" data-notes="DISCURSO DE APERTURA:
+• Buenos días estimado profesor y evaluadores.
+• Hoy presentamos 'Soluciones Cloud v1', una plataforma web de catálogo y gestión de inventario construida 100% bajo el paradigma Cloud Native.
+• El propósito central de este proyecto no fue solo crear una aplicación que funcione, sino demostrar una arquitectura desacoplada, resiliente y de seguridad bancaria: cero manejo de contraseñas locales, delegación en AWS Cognito y defensa perimetral con Amazon API Gateway.">
+      <div class="hero-container">
+        <span class="hero-badge">Evaluación Parcial N° 1 • DSY1107 • Duoc UC</span>
+        <h1 class="hero-title">Soluciones Cloud v1</h1>
+        <p class="hero-subtitle">Arquitectura Cloud Native Segura: Gestión de Productos con IDaaS (AWS Cognito), API Gateway, Spring Boot y React</p>
+        
+        <div class="chips-container">
+          <span class="chip">React 19 + Vite (Vercel)</span>
+          <span class="chip">AWS Cognito (PKCE)</span>
+          <span class="chip">Amazon API Gateway</span>
+          <span class="chip">Spring Boot 3 (Render)</span>
+          <span class="chip">PostgreSQL (Supabase)</span>
+        </div>
+
+        <div class="meta-card">
+          <div class="meta-team">Integrantes: Ignacio Salazar • Cristofer Cifuentes</div>
+          <div class="meta-env">Producción: Vercel • Render • AWS us-east-1</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== DIAPOSITIVA 2: EL RETO ==================== -->
+    <section class="slide" id="slide-2" data-notes="PUNTOS CLAVE PARA EL DISCURSO:
+• Al diseñar este sistema nos preguntamos: ¿Por qué seguir guardando contraseñas en bases de datos locales en pleno 2025/2026?
+• Un monolito tradicional gestiona sesiones en memoria y almacena contraseñas, convirtiéndose en un blanco fácil para vulnerabilidades OWASP.
+• Nuestra solución adopta la filosofía Zero Trust: delegamos la identidad en un proveedor bancario (AWS Cognito), eliminamos el estado del backend mediante tokens JWT y distribuimos la carga en la nube.">
+      <div class="slide-header">
+        <div>
+          <span class="category-badge">01 • Fundamentos</span>
+          <h2 class="slide-title">El Reto: Monolito Tradicional vs. Arquitectura Cloud Native</h2>
+        </div>
+        <div class="slide-number">02 / 10</div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card card-amber">
+          <h3>✖ Riesgos del Enfoque Tradicional</h3>
+          <div class="point-item">
+            <div class="point-title" style="color: var(--amber);">Gestión de Contraseñas Locales</div>
+            <div class="point-desc">Guardar hashes en BD propia expone al negocio a filtraciones críticas y ataques de fuerza bruta.</div>
+          </div>
+          <div class="point-item">
+            <div class="point-title" style="color: var(--amber);">Acoplamiento y Sesiones en Memoria</div>
+            <div class="point-desc">Sesiones HTTP en el servidor impiden escalar horizontalmente sin réplicas complejas.</div>
+          </div>
+          <div class="point-item">
+            <div class="point-title" style="color: var(--amber);">Punto Único de Falla (SPOF)</div>
+            <div class="point-desc">Si la base de datos o el servidor colapsan, todo el ecosistema cae sin aislamiento.</div>
+          </div>
+        </div>
+
+        <div class="card card-mint">
+          <h3>✔ Nuestra Solución: Cloud Native & Zero Trust</h3>
+          <div class="point-item">
+            <div class="point-title" style="color: var(--mint);">Identidad Delegada (IDaaS)</div>
+            <div class="point-desc">AWS Cognito asume el 100% de la responsabilidad de usuarios, passwords, MFA y tokens.</div>
+          </div>
+          <div class="point-item">
+            <div class="point-title" style="color: var(--mint);">Arquitectura 100% Stateless (JWT)</div>
+            <div class="point-desc">El backend no almacena estados ni sesiones; cada petición valida asimétricamente su token.</div>
+          </div>
+          <div class="point-item">
+            <div class="point-title" style="color: var(--mint);">Desacoplamiento Multi-Cloud Total</div>
+            <div class="point-desc">Servicios independientes en Vercel, AWS, Render y Supabase con máxima resiliencia.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== DIAPOSITIVA 3: TOPOLOGÍA ==================== -->
+    <section class="slide" id="slide-3" data-notes="PUNTOS CLAVE PARA EL DISCURSO:
+• Esta lámina ilustra las 4 capas de nuestra topología.
+• Capa 1: El frontend en Vercel es ligero y rápido; cualquiera puede ver el catálogo sin login.
+• Capa 2: Si el usuario desea gestionar productos, interactúa con AWS Cognito mediante Hosted UI.
+• Capa 3: El tráfico protegido viaja por Amazon API Gateway hacia nuestro backend en Render.
+• Capa 4: Los datos descansan de forma aislada en Supabase PostgreSQL. Cada pieza tiene una única responsabilidad bien definida.">
+      <div class="slide-header">
+        <div>
+          <span class="category-badge">02 • Arquitectura</span>
+          <h2 class="slide-title">Topología del Sistema: Ecosistema Multi-Cloud Desacoplado</h2>
+        </div>
+        <div class="slide-number">03 / 10</div>
+      </div>
+
+      <div class="stack-vertical">
+        <div class="card card-cyan" style="padding: 1.2rem 1.8rem;">
+          <h3>1. Frontend SPA (Vercel) — React 19 + TypeScript + Vite</h3>
+          <p>Aplicación estática de alto rendimiento. Acceso público al catálogo y orquestación de autenticación con PKCE.</p>
+        </div>
+        <div class="card card-mint" style="padding: 1.2rem 1.8rem;">
+          <h3>2. Identidad IDaaS (AWS Cognito) — User Pool + Hosted UI</h3>
+          <p>Gestor autoritativo de identidad en AWS us-east-1. Emite tokens criptográficos JWT (IdToken, AccessToken).</p>
+        </div>
+        <div class="card" style="padding: 1.2rem 1.8rem;">
+          <h3 style="color: var(--white);">3. Perímetro & BFF (AWS API Gateway + Render) — Spring Boot 3</h3>
+          <p>Puerta de enlace perimetral con filtrado de CORS y Resource Server en Java 17 con Spring Security 6.</p>
+        </div>
+        <div class="card card-amber" style="padding: 1.2rem 1.8rem;">
+          <h3>4. Persistencia Cloud (Supabase) — PostgreSQL 15+</h3>
+          <p>Base de datos relacional administrada conectada mediante pool transaccional seguro (puerto 5432 HikariCP).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== DIAPOSITIVA 4: AWS COGNITO + PKCE ==================== -->
+    <section class="slide" id="slide-4" data-notes="PUNTOS CLAVE PARA EL DISCURSO (DEFENSA TÉCNICA):
+• Pregunta típica de examen: ¿Por qué usan PKCE en lugar del flujo OAuth clásico?
+• Respuesta: Porque React es una SPA (cliente público). En el navegador el código JavaScript es visible para cualquiera; no podemos esconder un 'Client Secret'.
+• PKCE soluciona esto generando un secreto temporal (code_verifier) y enviando su huella matemática (code_challenge) a Amazon. Cuando Amazon responde, el navegador demuestra que tiene el secreto original. Esto neutraliza los ataques de hombre en el medio (MITM).">
+      <div class="slide-header">
+        <div>
+          <span class="category-badge">03 • Seguridad IDaaS</span>
+          <h2 class="slide-title">Gestión de Identidad: AWS Cognito y Protocolo PKCE</h2>
+        </div>
+        <div class="slide-number">04 / 10</div>
+      </div>
+
+      <div class="grid-3">
+        <div class="card card-cyan">
+          <h3>Cero Contraseñas Locales</h3>
+          <p class="point-desc" style="margin-bottom: 1rem;">• Nuestra aplicación ni el servidor ven jamás las contraseñas del usuario.</p>
+          <p class="point-desc" style="margin-bottom: 1rem;">• Eliminamos el riesgo de filtraciones y cumplimos normativas internacionales.</p>
+          <p class="point-desc">• Auto-confirmación por correo con códigos seguros de 6 dígitos.</p>
+        </div>
+
+        <div class="card card-mint">
+          <h3>Hosted UI Oficial de AWS</h3>
+          <p class="point-desc" style="margin-bottom: 1rem;">• Interfaz de inicio de sesión alojada en la nube global de Amazon Web Services.</p>
+          <p class="point-desc" style="margin-bottom: 1rem;">• Protección nativa contra ataques de fuerza bruta, bots y credenciales falsas.</p>
+          <p class="point-desc">• Aislamiento absoluto entre la interfaz del usuario y nuestro backend.</p>
+        </div>
+
+        <div class="card card-amber">
+          <h3>Flujo Criptográfico PKCE</h3>
+          <p class="point-desc" style="margin-bottom: 1rem;">• Proof Key for Code Exchange (RFC 7636) diseñado para clientes públicos SPA.</p>
+          <p class="point-desc" style="margin-bottom: 1rem;">• Genera code_verifier y code_challenge al vuelo para evitar intercepciones.</p>
+          <p class="point-desc">• Garantiza que sólo quien solicitó el login pueda canjear los tokens JWT.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== DIAPOSITIVA 5: DOBLE FILTRO ==================== -->
+    <section class="slide" id="slide-5" data-notes="PUNTOS CLAVE PARA EL DISCURSO:
+• Destacar el concepto de 'Defensa en Profundidad' (Defense in Depth).
+• No dependemos de un único punto de seguridad. Tenemos dos aduanas:
+  1. La aduana perimetral en Amazon API Gateway, que frena ataques o peticiones no autenticadas en la puerta de entrada sin molestar al servidor.
+  2. La aduana interna en Spring Security, que verifica criptográficamente que el token pertenezca a nuestro User Pool exacto y extrae la identidad del usuario.
+• Esto protege la infraestructura contra denegación de servicio y ahorra costos.">
+      <div class="slide-header">
+        <div>
+          <span class="category-badge">04 • Protección de Red</span>
+          <h2 class="slide-title">Defensa en Profundidad: Doble Filtro de Seguridad</h2>
+        </div>
+        <div class="slide-number">05 / 10</div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card card-cyan">
+          <h3>🛡️ 1° Filtro: Perímetro (Amazon API Gateway)</h3>
+          <div class="point-item">
+            <div class="point-title" style="color: var(--cyan);">Cognito Authorizer en el Borde</div>
+            <div class="point-desc">El Gateway intercepta la cabecera Authorization antes de reenviar el tráfico al servidor.</div>
+          </div>
+          <div class="point-item">
+            <div class="point-title" style="color: var(--cyan);">Bloqueo Inmediato (HTTP 401)</div>
+            <div class="point-desc">Peticiones con tokens vencidos o fraudulentos son rechazadas en el perímetro.</div>
+          </div>
+          <div class="point-item">
+            <div class="point-title" style="color: var(--cyan);">Ahorro de Cómputo y Resiliencia</div>
+            <div class="point-desc">El backend en Render nunca procesa tráfico malicioso, ahorrando memoria y CPU.</div>
+          </div>
+        </div>
+
+        <div class="card card-mint">
+          <h3>🔒 2° Filtro: Backend (Spring Security 6)</h3>
+          <div class="point-item">
+            <div class="point-title" style="color: var(--mint);">Resource Server Criptográfico</div>
+            <div class="point-desc">Spring Boot valida asimétricamente (RS256) la firma digital del token recibido.</div>
+          </div>
+          <div class="point-item">
+            <div class="point-title" style="color: var(--mint);">Verificación con JWKS de AWS</div>
+            <div class="point-desc">Descarga claves públicas directas desde Amazon; sin contraseñas compartidas.</div>
+          </div>
+          <div class="point-item">
+            <div class="point-title" style="color: var(--mint);">Extracción de Identidad Segura</div>
+            <div class="point-desc">Asocia cada acción al correo del claim 'email' garantizando autoría y no repudio.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== DIAPOSITIVA 6: ANATOMÍA JWT ==================== -->
+    <section class="slide" id="slide-6" data-notes="PUNTOS CLAVE PARA EL DISCURSO:
+• Explicar de forma muy pedagógica qué es un JWT:
+• Tres partes separadas por puntos y codificadas en Base64Url: Header, Payload y Firma.
+• Lo fundamental es la firma: Amazon firma con su llave PRIVADA en la nube. Nuestro backend solo descarga la llave PÚBLICA (JWKS) para verificar la autenticidad.
+• Como la verificación es matemática y local, el backend responde en microsegundos sin hacer consultas a bases de datos de usuarios.">
+      <div class="slide-header">
+        <div>
+          <span class="category-badge">05 • Criptografía JWT</span>
+          <h2 class="slide-title">Anatomía del Token JWT: El Pasaporte Digital</h2>
+        </div>
+        <div class="slide-number">06 / 10</div>
+      </div>
+
+      <div class="grid-3" style="flex: 0 1 auto; margin-bottom: 1.5rem;">
+        <div class="card card-cyan">
+          <h3>1. Header (Encabezado)</h3>
+          <p class="point-desc">• Algoritmo: RS256 (Asimétrico)</p>
+          <p class="point-desc">• Tipo: JWT</p>
+          <p class="point-desc">• Key ID (kid): Identifica llave en JWKS</p>
+        </div>
+
+        <div class="card card-mint">
+          <h3>2. Payload (Claims)</h3>
+          <p class="point-desc">• sub: UUID único del usuario</p>
+          <p class="point-desc">• email: Correo verificado</p>
+          <p class="point-desc">• iss: Emisor oficial Cognito</p>
+          <p class="point-desc">• exp: Expiración matemática</p>
+        </div>
+
+        <div class="card card-amber">
+          <h3>3. Signature (Firma Digital)</h3>
+          <p class="point-desc">• Cifrado asimétrico con clave privada AWS</p>
+          <p class="point-desc">• Integridad matemática absoluta</p>
+          <p class="point-desc">• Si se altera un bit, la firma se anula</p>
+        </div>
+      </div>
+
+      <div class="card" style="background: rgba(20, 32, 60, 0.9); border-color: var(--cyan);">
+        <p style="font-size: 1.15rem; color: var(--cyan); font-weight: 600;">
+          💡 Analogía: El JWT es como un pasaporte sellado por un consulado (AWS). El backend no necesita llamar al consulado en cada petición; sólo verifica que el sello sea auténtico usando la clave pública consular.
+        </p>
+      </div>
+    </section>
+
+    <!-- ==================== DIAPOSITIVA 7: SPRING SECURITY ==================== -->
+    <section class="slide" id="slide-7" data-notes="PUNTOS CLAVE PARA EL DISCURSO:
+• En el backend configuramos Spring Boot 3.4 como un OAuth2 Resource Server formal.
+• Eliminamos la sesión del servidor: SessionCreationPolicy.STATELESS.
+• Cuando llega un producto nuevo, Spring Boot extrae el email del token verificado. No hay posibilidad de que un usuario suplante la identidad de otro, porque el token está blindado criptográficamente.">
+      <div class="slide-header">
+        <div>
+          <span class="category-badge">06 • Backend & Lógica</span>
+          <h2 class="slide-title">Backend Stateless: Spring Boot 3 & Resource Server</h2>
+        </div>
+        <div class="slide-number">07 / 10</div>
+      </div>
+
+      <div class="stack-vertical">
+        <div class="card card-cyan">
+          <h3>Arquitectura 100% Stateless</h3>
+          <p>El backend no guarda sesiones en memoria ni cookies de sesión. Cada petición HTTP es autónoma y autosuficiente, permitiendo réplicas instantáneas en Render sin sincronización de caché.</p>
+        </div>
+        <div class="card card-mint">
+          <h3>Sincronización Automática con JWKS</h3>
+          <p>Spring Security consulta el endpoint de llaves públicas de Cognito: valida emisor (iss), audiencia y vigencia temporal (exp) de forma asimétrica y automática sin escribir código de verificación manual.</p>
+        </div>
+        <div class="card card-amber">
+          <h3>Extracción de Identidad Segura</h3>
+          <p>Mediante la anotación <code>@AuthenticationPrincipal Jwt</code>, el controlador obtiene directamente el email verificado del usuario para registrar la autoría del producto sin riesgo de suplantación.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== DIAPOSITIVA 8: SUPABASE ==================== -->
+    <section class="slide" id="slide-8" data-notes="PUNTOS CLAVE PARA EL DISCURSO:
+• Pregunta típica: ¿Por qué conectarse por el puerto 5432 (Session Pooler) en Supabase?
+• Respuesta: Porque los entornos Cloud como Render generan conexiones dinámicas. El Session Pooler gestiona eficientemente el ciclo de vida de las conexiones y evita que se agoten los sockets de PostgreSQL.
+• Además, mediante Spring Data JPA e Hibernate, el esquema se valida automáticamente al iniciar la aplicación.">
+      <div class="slide-header">
+        <div>
+          <span class="category-badge">07 • Almacenamiento</span>
+          <h2 class="slide-title">Persistencia Cloud: Supabase PostgreSQL Gestionado</h2>
+        </div>
+        <div class="slide-number">08 / 10</div>
+      </div>
+
+      <div class="stack-vertical">
+        <div class="card card-cyan">
+          <h3>Base de Datos Relacional ACID</h3>
+          <p>PostgreSQL 15+ administrado en la nube con integridad transaccional, claves foráneas, índices optimizados y respaldos continuos sin mantenimiento manual de infraestructura.</p>
+        </div>
+        <div class="card card-mint">
+          <h3>Session Pooler (Puerto 5432)</h3>
+          <p>Integración optimizada con HikariCP. El pooler de Supabase multiplexa las conexiones concurrentes, evitando la saturación del servidor bajo alta concurrencia o reinicios de instancias en Render.</p>
+        </div>
+        <div class="card card-amber">
+          <h3>Aislamiento Total de Credenciales</h3>
+          <p>La base de datos sólo acepta conexiones SSL cifradas. Las credenciales residen en variables de entorno seguras en Render, jamás expuestas en el código fuente ni en el repositorio GitHub.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== DIAPOSITIVA 9: LIVE DEMO ==================== -->
+    <section class="slide" id="slide-9" data-notes="GUÍA PARA LA DEMOSTRACIÓN ANTE LA COMISIÓN:
+1. Mostrar la URL de Vercel (https://soluciones-cloud-v1.vercel.app): evidenciar que los productos cargan sin login.
+2. Abrir la pestaña 'Network' (Red) en las herramientas de desarrollador del navegador.
+3. Pulsar 'Iniciar sesión con Cognito' y mostrar la URL de amazon cognito en la barra de direcciones.
+4. Iniciar sesión y crear un producto nuevo (ej. 'Monitor Gamer 4K').
+5. Señalar en la consola de red la cabecera 'Authorization: Bearer' y el código HTTP 201 Created.
+6. Mostrar el nuevo producto visible en la lista.">
+      <div class="slide-header">
+        <div>
+          <span class="category-badge">08 • Live Demo</span>
+          <h2 class="slide-title">Demostración Práctica: Circuito de Validación en Vivo</h2>
+        </div>
+        <div class="slide-number">09 / 10</div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card card-cyan">
+          <h3>Paso 1: Acceso Público</h3>
+          <p>Ingreso a Vercel sin sesión activa. El catálogo de productos carga de forma pública desde Supabase sin restricciones.</p>
+        </div>
+        <div class="card card-mint">
+          <h3>Paso 2: Login con Cognito</h3>
+          <p>Clic en 'Iniciar sesión'. Redirección segura a la Hosted UI oficial de AWS y validación criptográfica con PKCE.</p>
+        </div>
+        <div class="card card-amber">
+          <h3>Paso 3: Creación de Producto</h3>
+          <p>Completar formulario. Petición POST protegida con cabecera <code>Authorization: Bearer &lt;token&gt;</code> hacia API Gateway.</p>
+        </div>
+        <div class="card" style="border-color: var(--white);">
+          <h3 style="color: var(--white);">Paso 4: Auditoría y Persistencia</h3>
+          <p>El backend valida el token, guarda en Supabase (puerto 5432) y la interfaz de React se actualiza al instante.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== DIAPOSITIVA 10: CONCLUSIONES ==================== -->
+    <section class="slide" id="slide-10" data-notes="CIERRE FORMAL:
+• Con esto concluimos la defensa de nuestra arquitectura para 'Soluciones Cloud v1'.
+• Hemos demostrado que es posible construir una solución de comercio e inventario moderna, segura y de costo cero en desarrollo, aplicando los mismos estándares que utilizan las grandes empresas tecnológicas.
+• Muchas gracias, profesor. Quedamos atentos a sus preguntas y observaciones.">
+      <div class="slide-header">
+        <div>
+          <span class="category-badge">09 • Cierre & Defensa</span>
+          <h2 class="slide-title">Conclusiones: Arquitectura de Grado Empresarial</h2>
+        </div>
+        <div class="slide-number">10 / 10</div>
+      </div>
+
+      <div class="card card-cyan" style="margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 1.2rem;">Pilares Cumplidos del Proyecto</h3>
+        <p class="point-desc" style="margin-bottom: 0.8rem;">✔ <strong>Desacoplamiento 100% Multi-Cloud:</strong> Cada servicio vive en su propio proveedor óptimo (Vercel, AWS, Render, Supabase).</p>
+        <p class="point-desc" style="margin-bottom: 0.8rem;">✔ <strong>Seguridad Bancaria Delegada:</strong> Cero contraseñas en código o BD; protección total con AWS Cognito y flujo PKCE.</p>
+        <p class="point-desc">✔ <strong>Defensa en Profundidad:</strong> Doble barrera perimetral con Amazon API Gateway y verificación asimétrica en Spring Boot.</p>
+      </div>
+
+      <div class="card card-mint">
+        <h3 style="font-size: 1.6rem; color: var(--white);">Muchas gracias por su atención</h3>
+        <p style="font-size: 1.15rem; color: var(--silver); margin-top: 0.5rem;">Quedamos a disposición de la comisión evaluadora para responder dudas y profundizar en la arquitectura.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Drawer de Notas del Orador -->
+  <aside class="notes-drawer" id="notesDrawer">
+    <div class="notes-header">
+      <h4>Notas del Orador (Guion)</h4>
+      <button class="btn" id="closeNotesBtn" style="padding: 2px 8px;">✕</button>
+    </div>
+    <div class="notes-content" id="notesContent"></div>
+  </aside>
+
+  <!-- Barra Inferior de Navegación -->
+  <footer class="bottom-bar">
+    <div class="footer-left">Soluciones Cloud v1 • DSY1107 • Duoc UC</div>
+    <div class="controls">
+      <button class="btn" id="notesToggleBtn">📝 Notas (N)</button>
+      <button class="btn" id="prevBtn">◀ Anterior</button>
+      <button class="btn" id="nextBtn">Siguiente ▶</button>
+      <button class="btn" id="fullscreenBtn">⛶ Pantalla Completa (F)</button>
+    </div>
+  </footer>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 10;
+
+    const slides = document.querySelectorAll('.slide');
+    const progressBar = document.getElementById('progressBar');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const notesToggleBtn = document.getElementById('notesToggleBtn');
+    const closeNotesBtn = document.getElementById('closeNotesBtn');
+    const notesDrawer = document.getElementById('notesDrawer');
+    const notesContent = document.getElementById('notesContent');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+    function updateSlide(index) {
+      if (index < 1) index = 1;
+      if (index > totalSlides) index = totalSlides;
+      currentSlide = index;
+
+      slides.forEach((s, idx) => {
+        if (idx + 1 === currentSlide) {
+          s.classList.add('active');
+          notesContent.textContent = s.dataset.notes || 'Sin notas disponibles.';
+        } else {
+          s.classList.remove('active');
+        }
+      });
+
+      progressBar.style.width = `${(currentSlide / totalSlides) * 100}%`;
+      prevBtn.disabled = currentSlide === 1;
+      nextBtn.disabled = currentSlide === totalSlides;
+    }
+
+    prevBtn.addEventListener('click', () => updateSlide(currentSlide - 1));
+    nextBtn.addEventListener('click', () => updateSlide(currentSlide + 1));
+
+    notesToggleBtn.addEventListener('click', () => {
+      notesDrawer.classList.toggle('open');
+      notesToggleBtn.classList.toggle('btn-active');
+    });
+
+    closeNotesBtn.addEventListener('click', () => {
+      notesDrawer.classList.remove('open');
+      notesToggleBtn.classList.remove('btn-active');
+    });
+
+    fullscreenBtn.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        updateSlide(currentSlide + 1);
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        updateSlide(currentSlide - 1);
+      } else if (e.key === 'n' || e.key === 'N') {
+        notesDrawer.classList.toggle('open');
+        notesToggleBtn.classList.toggle('btn-active');
+      } else if (e.key === 'f' || e.key === 'F') {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          document.exitFullscreen().catch(() => {});
+        }
+      }
+    });
+
+    updateSlide(1);
+  </script>
+</body>
+</html>

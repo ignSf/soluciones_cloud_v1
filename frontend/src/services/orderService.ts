@@ -1,9 +1,39 @@
 import type { Order } from '../types/order';
 
+const RENDER_ORDERS_URL = 'https://soluciones-cloud-v1.onrender.com/api/orders';
+
+// Si VITE_ORDERS_API_URL está definido, usarlo.
+// Si VITE_API_URL está definido y NO es de AWS API Gateway (que no tiene /api/orders configurado), reemplazarlo.
+// En cualquier otro caso, apuntar directamente al backend en Render.
 const DEFAULT_ORDERS_URL = import.meta.env.VITE_ORDERS_API_URL ||
-  (import.meta.env.VITE_API_URL 
+  (import.meta.env.VITE_API_URL && !import.meta.env.VITE_API_URL.includes('execute-api')
     ? import.meta.env.VITE_API_URL.replace(/\/api\/products\/?$/, '/api/orders') 
-    : 'https://8086dx45a7.execute-api.us-east-1.amazonaws.com/prod/api/orders');
+    : RENDER_ORDERS_URL);
+
+/**
+ * Función auxiliar con reintento automático hacia Render en caso de fallo de red (CORS o Gateway no mapeado)
+ */
+async function fetchOrdersWithFallback(endpoint: string, options: RequestInit): Promise<Response> {
+  const primaryUrl = `${DEFAULT_ORDERS_URL}${endpoint}`;
+  try {
+    const res = await fetch(primaryUrl, options);
+    // Si la pasarela devuelve 403 MissingAuthenticationTokenException o 404
+    if (res.status === 403 || res.status === 404) {
+      if (primaryUrl !== `${RENDER_ORDERS_URL}${endpoint}`) {
+        console.warn(`[OrderService] Fallo en endpoint primario (${res.status}). Reintentando contra Render...`);
+        return await fetch(`${RENDER_ORDERS_URL}${endpoint}`, options);
+      }
+    }
+    return res;
+  } catch (err) {
+    // Si ocurre un error de red (Failed to fetch por CORS en API Gateway)
+    if (primaryUrl !== `${RENDER_ORDERS_URL}${endpoint}`) {
+      console.warn('[OrderService] Error de red en URL primaria. Redirigiendo petición directamente a Render...');
+      return await fetch(`${RENDER_ORDERS_URL}${endpoint}`, options);
+    }
+    throw err;
+  }
+}
 
 export const orderService = {
   /**
@@ -17,9 +47,14 @@ export const orderService = {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const response = await fetch(`${DEFAULT_ORDERS_URL}/my-orders`, {
+    const response = await fetchOrdersWithFallback('/my-orders', {
       headers,
     });
+
+    if (response.status === 401 || response.status === 403) {
+      throw new Error('Debe iniciar sesión para consultar sus pedidos.');
+    }
+
     if (!response.ok) {
       throw new Error(`Error al obtener pedidos: ${response.status} ${response.statusText}`);
     }
@@ -37,7 +72,7 @@ export const orderService = {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const response = await fetch(DEFAULT_ORDERS_URL, {
+    const response = await fetchOrdersWithFallback('', {
       method: 'POST',
       headers,
       body: JSON.stringify(order),
@@ -63,7 +98,7 @@ export const orderService = {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const response = await fetch(DEFAULT_ORDERS_URL, {
+    const response = await fetchOrdersWithFallback('', {
       headers,
     });
     if (!response.ok) {

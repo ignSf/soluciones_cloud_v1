@@ -27,8 +27,8 @@ export function App() {
   // Control de pantalla: 'inicio' | 'tienda' | 'inventario' | 'pedidos'
   const [pagina, setPagina] = useState<'inicio' | 'tienda' | 'inventario' | 'pedidos'>('inicio');
 
-  // El access_token es el que autoriza contra la API; el id_token queda en el front
-  const userToken = auth.user?.access_token;
+  // El access_token es el que autoriza contra la API; el id_token queda como fallback
+  const userToken = auth.user?.access_token || auth.user?.id_token;
 
   const fetchProducts = async () => {
     try {

@@ -82,7 +82,7 @@ export function useAuth() {
           name: msalAccount.name,
           sub: msalAccount.localAccountId,
         },
-        access_token: msalAccessToken,
+        access_token: msalAccessToken || msalAccount.idToken,
         id_token: msalAccount.idToken,
       }
     : isCognitoAuthenticated && cognitoAuth.user
