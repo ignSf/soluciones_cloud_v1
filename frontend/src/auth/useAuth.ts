@@ -82,7 +82,7 @@ export function useAuth() {
           name: msalAccount.name,
           sub: msalAccount.localAccountId,
         },
-        access_token: msalAccessToken || msalAccount.idToken,
+        access_token: msalAccount.idToken || msalAccessToken,
         id_token: msalAccount.idToken,
       }
     : isCognitoAuthenticated && cognitoAuth.user
@@ -93,7 +93,7 @@ export function useAuth() {
           name: (cognitoAuth.user.profile?.name as string) || (cognitoAuth.user.profile?.['cognito:username'] as string),
           sub: cognitoAuth.user.profile?.sub,
         },
-        access_token: cognitoAuth.user.access_token,
+        access_token: cognitoAuth.user.id_token || cognitoAuth.user.access_token,
         id_token: cognitoAuth.user.id_token,
       }
     : undefined;

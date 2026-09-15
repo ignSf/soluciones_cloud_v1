@@ -15,6 +15,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 
 import java.util.List;
 
@@ -93,5 +95,28 @@ public class SecurityConfig {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
         converter.setJwtGrantedAuthoritiesConverter(authorities);
         return converter;
+    }
+
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        NimbusJwtDecoder microsoftDecoder = NimbusJwtDecoder
+                .withJwkSetUri("https://login.microsoftonline.com/6cb75a5d-5ddb-4496-b0e3-f9e5d62cd9db/discovery/v2.0/keys")
+                .build();
+
+        NimbusJwtDecoder cognitoDecoder = NimbusJwtDecoder
+                .withJwkSetUri("https://cognito-idp.us-east-1.amazonaws.com/us-east-1_OL9DjB9XL/.well-known/jwks.json")
+                .build();
+
+        return token -> {
+            try {
+                return microsoftDecoder.decode(token);
+            } catch (Exception e1) {
+                try {
+                    return cognitoDecoder.decode(token);
+                } catch (Exception e2) {
+                    throw e1;
+                }
+            }
+        };
     }
 }
