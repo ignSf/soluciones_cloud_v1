@@ -5,6 +5,8 @@ import com.example.demo.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.messaging.sqs.SqsNotificacionPublisher;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -14,8 +16,12 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
 
-    public Order createOrder(Order order) {
-        return orderRepository.save(order);
+    private final SqsNotificacionPublisher sqsNotificacionPublisher;
+
+        public Order createOrder(Order order) {
+        Order saved = orderRepository.save(order);
+        sqsNotificacionPublisher.publicarPedidoCreado(saved);
+        return saved;
     }
 
     public List<Order> getOrdersByUser(String userEmail) {
