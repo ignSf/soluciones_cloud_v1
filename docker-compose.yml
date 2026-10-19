@@ -1,4 +1,5 @@
 services:
+  # Broker 1: RabbitMQ (Inventario - Trabajo Compañero 1)
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
@@ -12,6 +13,21 @@ services:
       retries: 5
     restart: unless-stopped
 
+  # Broker 2 / 3: LavinMQ (Envíos y Despacho - Su Trabajo)
+  lavinmq:
+    image: cloudamqp/lavinmq:latest
+    container_name: lavinmq
+    ports:
+      - "5673:5672"
+      - "1234:1234"
+    healthcheck:
+      test: ["CMD", "lavinmqctl", "status"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+  # Backend Principal: Catálogo y Órdenes (Emisor a RabbitMQ, SQS y LavinMQ)
   demo:
     build: ./demo
     container_name: demo
@@ -25,11 +41,22 @@ services:
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_USER: ${RABBITMQ_USER:-guest}
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-guest}
+      LAVINMQ_HOST: lavinmq
+      LAVINMQ_PORT: 5672
+      LAVINMQ_USER: ${LAVINMQ_USER:-guest}
+      LAVINMQ_PASSWORD: ${LAVINMQ_PASSWORD:-guest}
+      LAVINMQ_SHIPPING_ENABLED: ${LAVINMQ_SHIPPING_ENABLED:-true}
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+      SQS_NOTIFICACIONES_ENABLED: ${SQS_NOTIFICACIONES_ENABLED:-false}
+      SQS_NOTIFICACIONES_URL: ${SQS_NOTIFICACIONES_URL:-}
     depends_on:
       rabbitmq:
         condition: service_healthy
+      lavinmq:
+        condition: service_healthy
     restart: unless-stopped
 
+  # Microservicio 1: Inventario (Consumidor RabbitMQ)
   inventory-service:
     build: ./inventory-service
     container_name: inventory-service
@@ -49,6 +76,42 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  # Microservicio 2: Notificaciones (Consumidor Amazon SQS)
+  notificaciones-service:
+    build: ./notificaciones-service
+    container_name: notificaciones-service
+    ports:
+      - "8082:8082"
+    environment:
+      PORT: 8082
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+      SQS_NOTIFICACIONES_URL: ${SQS_NOTIFICACIONES_URL:-}
+      SQS_NOTIFICACIONES_DLQ_URL: ${SQS_NOTIFICACIONES_DLQ_URL:-}
+      SQS_CONSUMER_ENABLED: ${SQS_CONSUMER_ENABLED:-false}
+      SIMULAR_FALLO: ${SIMULAR_FALLO:-false}
+    restart: unless-stopped
+
+  # Microservicio 3: Envíos y Logística (Consumidor LavinMQ - Su Servicio)
+  shipping-service:
+    build: ./shipping-service
+    container_name: shipping-service
+    ports:
+      - "8083:8083"
+    environment:
+      PORT: 8083
+      SPRING_DATASOURCE_URL: ${SHIPPING_DATASOURCE_URL:-jdbc:h2:mem:shippingdb}
+      SPRING_DATASOURCE_USERNAME: ${SHIPPING_DATASOURCE_USERNAME:-sa}
+      SPRING_DATASOURCE_PASSWORD: ${SHIPPING_DATASOURCE_PASSWORD:-}
+      LAVINMQ_HOST: lavinmq
+      LAVINMQ_PORT: 5672
+      LAVINMQ_USER: ${LAVINMQ_USER:-guest}
+      LAVINMQ_PASSWORD: ${LAVINMQ_PASSWORD:-guest}
+    depends_on:
+      lavinmq:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Frontend Web (React + TypeScript + Vite)
   frontend:
     build:
       context: ./frontend
