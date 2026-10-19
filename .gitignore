@@ -16,3 +16,6 @@ Thumbs.db
 
 # Data
 data/
+
+# Docker compose
+.env

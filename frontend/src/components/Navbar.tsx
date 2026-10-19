@@ -97,5 +97,3 @@ export const Navbar: React.FC<NavbarProps> = ({ itemCount, paginaActual, onCambi
     </header>
   );
 };
-
-export default Navbar;

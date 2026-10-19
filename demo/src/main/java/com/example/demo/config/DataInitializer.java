@@ -17,22 +17,22 @@ public class DataInitializer {
             if (productRepository.count() == 0) {
                 productRepository.saveAll(List.of(
                     Product.builder()
-                        .name("Laptop Dell XPS 15")
-                        .description("Intel Core i7, 16GB RAM, 512GB SSD")
-                        .price(1499.99)
-                        .category("Hardware")
+                        .name("Yani Neko Vol 1")
+                        .description("Primer tomo del manga Yani Neko (ChainSmoker Cat)")
+                        .price(9.00)
+                        .category("Seinen")
                         .build(),
                     Product.builder()
-                        .name("Monitor LG UltraWide 34\"")
-                        .description("Resolución WQHD 144Hz IPS")
-                        .price(599.50)
-                        .category("Periféricos")
+                        .name("Mirai Nikki Vol 6")
+                        .description("Tomo 6 de Mirai Nikki")
+                        .price(9.00)
+                        .category("Romance, Terror")
                         .build(),
                     Product.builder()
-                        .name("Suscripción Azure Cloud")
-                        .description("Créditos de cómputo y servicios cognitivos")
-                        .price(250.00)
-                        .category("Servicios Cloud")
+                        .name("Naruto Vol 2")
+                        .description("Tomo 2 de Naruto")
+                        .price(7.00)
+                        .category("Shonen")
                         .build()
                 ));
             }

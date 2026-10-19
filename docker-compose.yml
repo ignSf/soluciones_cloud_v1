@@ -1,0 +1,63 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+  demo:
+    build: ./demo
+    container_name: demo
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: 8080
+      SPRING_DATASOURCE_URL: ${DEMO_DATASOURCE_URL:-jdbc:h2:mem:testdb}
+      SPRING_DATASOURCE_USERNAME: ${DEMO_DATASOURCE_USERNAME:-sa}
+      SPRING_DATASOURCE_PASSWORD: ${DEMO_DATASOURCE_PASSWORD:-}
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-guest}
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
+
+  inventory-service:
+    build: ./inventory-service
+    container_name: inventory-service
+    ports:
+      - "8081:8081"
+    environment:
+      PORT: 8081
+      SPRING_DATASOURCE_URL: ${INVENTORY_DATASOURCE_URL:-jdbc:h2:mem:inventorydb}
+      SPRING_DATASOURCE_USERNAME: ${INVENTORY_DATASOURCE_USERNAME:-sa}
+      SPRING_DATASOURCE_PASSWORD: ${INVENTORY_DATASOURCE_PASSWORD:-}
+      INVENTORY_SECURITY_OPEN: ${INVENTORY_SECURITY_OPEN:-false}
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-guest}
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8080/api/products}
+        VITE_ORDERS_API_URL: ${VITE_ORDERS_API_URL:-http://localhost:8080/api/orders}
+    container_name: frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - demo
+    restart: unless-stopped

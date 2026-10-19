@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.messaging.OrderEventPublisher;
 import com.example.demo.model.Order;
 import com.example.demo.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,9 +14,12 @@ import java.util.Optional;
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final OrderEventPublisher orderEventPublisher;
 
     public Order createOrder(Order order) {
-        return orderRepository.save(order);
+        Order saved = orderRepository.save(order);
+        orderEventPublisher.publishOrderCreated(saved);
+        return saved;
     }
 
     public List<Order> getOrdersByUser(String userEmail) {
