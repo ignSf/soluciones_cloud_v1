@@ -222,7 +222,7 @@ export function App() {
           <div className="tri-broker-banner">
             <div className="tri-broker-content">
               <div className="tri-broker-headline">
-                <span className="tri-broker-title">🎉 ¡Compra Exitosa! Orden #{triBrokerNotice.orderId} Confirmada</span>
+                <span className="tri-broker-title">Compra Confirmada — Orden #{triBrokerNotice.orderId}</span>
                 <span className="tri-broker-tag">Orquestador Tri-Broker</span>
               </div>
               <p className="tri-broker-text">
@@ -230,13 +230,13 @@ export function App() {
               </p>
               <div className="tri-broker-event-pills">
                 <span className="event-pill pill-rabbitmq">
-                  🐰 <strong>RabbitMQ:</strong> Descontó 1 u. de stock en <code>inventory-service</code> (:8081)
+                  <strong>RabbitMQ:</strong> Descontó 1 u. de stock en <code>inventory-service</code> (:8081)
                 </span>
                 <span className="event-pill pill-sqs">
-                  ☁️ <strong>Amazon SQS:</strong> Encoló correo de confirmación en <code>notificaciones-service</code> (:8082)
+                  <strong>Amazon SQS:</strong> Encoló correo de confirmación en <code>notificaciones-service</code> (:8082)
                 </span>
                 <span className="event-pill pill-lavinmq">
-                  ⚡ <strong>LavinMQ:</strong> Generó guía de despacho <strong>{triBrokerNotice.trackingNumber}</strong> en <code>shipping-service</code> (:8083)
+                  <strong>LavinMQ:</strong> Generó guía de despacho <strong>{triBrokerNotice.trackingNumber}</strong> en <code>shipping-service</code> (:8083)
                 </span>
               </div>
             </div>
@@ -249,7 +249,7 @@ export function App() {
                 }}
                 className="btn-track-instant"
               >
-                🚚 Rastrear Guía en Vivo →
+                Rastrear Guía →
               </button>
               <button
                 onClick={() => setTriBrokerNotice(null)}
@@ -285,7 +285,7 @@ export function App() {
                   onClick={() => setPagina('envios')}
                   title="Ver centro de rastreo de envíos en tiempo real"
                 >
-                  🚚 Centro de Envíos (LavinMQ)
+                  Centro de Envíos (LavinMQ)
                 </button>
 
                 {!auth.isAuthenticated ? (
@@ -364,7 +364,7 @@ export function App() {
                   className="btn-nav-to-shipping"
                   title="Ir al módulo de despacho y seguimiento"
                 >
-                  🚚 Rastrear Envíos (LavinMQ)
+                  Rastrear Envíos (LavinMQ)
                 </button>
                 <button onClick={fetchProducts} className="btn-refresh" title="Recargar catálogo">
                   ↻ Refrescar
@@ -423,7 +423,7 @@ export function App() {
                 </div>
                 <div className="orders-header-actions">
                   <button onClick={() => setPagina('envios')} className="btn-tracker-nav-home">
-                    🚚 Centro de Rastreo
+                    Centro de Rastreo
                   </button>
                   <button onClick={() => setPagina('tienda')} className="btn-enter-store-small">
                     + Comprar Más Artículos
@@ -471,11 +471,11 @@ export function App() {
                         {/* Bloque Logístico de LavinMQ en la Orden */}
                         <div className="order-shipping-block">
                           <div className="order-shipping-top">
-                            <span className="shipping-broker-tag">⚡ LavinMQ Envíos</span>
+                            <span className="shipping-broker-tag">LavinMQ Envíos</span>
                             <span className={`order-shipping-pill pill-${shippingStatus.toLowerCase()}`}>
-                              {shippingStatus === 'PREPARING' && '🟡 Preparación'}
-                              {shippingStatus === 'IN_TRANSIT' && '🔵 En Tránsito'}
-                              {shippingStatus === 'DELIVERED' && '🟢 Entregado'}
+                              {shippingStatus === 'PREPARING' && 'Preparación'}
+                              {shippingStatus === 'IN_TRANSIT' && 'En Tránsito'}
+                              {shippingStatus === 'DELIVERED' && 'Entregado'}
                             </span>
                           </div>
                           
@@ -492,7 +492,7 @@ export function App() {
                             }}
                             title="Ver seguimiento detallado en el centro logístico"
                           >
-                            Ver Rastreo en Vivo →
+                            Ver Rastreo →
                           </button>
                         </div>
 

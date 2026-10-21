@@ -108,7 +108,7 @@ export const ShippingTracker: React.FC<ShippingTrackerProps> = ({
       <div className="tracker-header">
         <div>
           <div className="tracker-badge-cluster">
-            <span className="badge-broker-lavin">⚡ LavinMQ AMQP 0-9-1</span>
+            <span className="badge-broker-lavin">LavinMQ AMQP 0-9-1</span>
             <span className="badge-service-port">shipping-service (:8083)</span>
           </div>
           <h1 className="tracker-title">Rastreo de Envíos y Despacho</h1>
@@ -128,7 +128,10 @@ export const ShippingTracker: React.FC<ShippingTrackerProps> = ({
           className="tracker-search-form"
         >
           <div className="tracker-search-input-wrap">
-            <span className="search-icon">🔍</span>
+            <svg className="search-svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
             <input
               type="text"
               className="tracker-search-input"
@@ -156,7 +159,7 @@ export const ShippingTracker: React.FC<ShippingTrackerProps> = ({
                     handleSearch(s.trackingNumber);
                   }}
                 >
-                  📦 {s.trackingNumber}
+                  <span className="chip-code">{s.trackingNumber}</span>
                   <span className={`chip-status chip-${s.status.toLowerCase()}`}>
                     {s.status}
                   </span>
@@ -169,13 +172,13 @@ export const ShippingTracker: React.FC<ShippingTrackerProps> = ({
 
       {errorMessage && (
         <div className="tracker-error-banner">
-          ⚠️ {errorMessage}
+          {errorMessage}
         </div>
       )}
 
       {successNotice && (
         <div className="success-banner">
-          <span>✓ {successNotice}</span>
+          <span>{successNotice}</span>
         </div>
       )}
 
@@ -189,14 +192,14 @@ export const ShippingTracker: React.FC<ShippingTrackerProps> = ({
             </div>
             <div className="shipment-status-pill-wrap">
               <span className={`shipment-status-pill status-${currentShipment.status.toLowerCase()}`}>
-                {currentShipment.status === 'PREPARING' && '🟡 En Preparación en Bodega'}
-                {currentShipment.status === 'IN_TRANSIT' && '🔵 En Tránsito / Reparto'}
-                {currentShipment.status === 'DELIVERED' && '🟢 Entregado con Éxito'}
+                {currentShipment.status === 'PREPARING' && 'En Preparación'}
+                {currentShipment.status === 'IN_TRANSIT' && 'En Tránsito'}
+                {currentShipment.status === 'DELIVERED' && 'Entregado'}
               </span>
             </div>
           </div>
 
-          {/* Stepper Gráfico */}
+          {/* Stepper Gráfico con Números Profesionales */}
           <div className="tracking-stepper">
             <div className="stepper-progress-track">
               <div
@@ -208,28 +211,28 @@ export const ShippingTracker: React.FC<ShippingTrackerProps> = ({
             <div className="stepper-steps">
               {/* Paso 1 */}
               <div className="stepper-step completed">
-                <div className="step-circle">✓</div>
+                <div className="step-circle">1</div>
                 <div className="step-label">Orden Creada</div>
                 <div className="step-sub">Backend demo (:8080)</div>
               </div>
 
               {/* Paso 2 */}
               <div className={`stepper-step ${stepLevel >= 2 ? 'active-step' : ''}`}>
-                <div className="step-circle">🏭</div>
+                <div className="step-circle">2</div>
                 <div className="step-label">Bodega Central</div>
                 <div className="step-sub">LavinMQ (PREPARING)</div>
               </div>
 
               {/* Paso 3 */}
               <div className={`stepper-step ${stepLevel >= 3 ? 'active-step' : ''}`}>
-                <div className="step-circle">🚚</div>
+                <div className="step-circle">3</div>
                 <div className="step-label">En Tránsito</div>
                 <div className="step-sub">Transportista en ruta</div>
               </div>
 
               {/* Paso 4 */}
               <div className={`stepper-step ${stepLevel >= 4 ? 'active-step' : ''}`}>
-                <div className="step-circle">🏠</div>
+                <div className="step-circle">4</div>
                 <div className="step-label">Entregado</div>
                 <div className="step-sub">Recepción confirmada</div>
               </div>
@@ -243,7 +246,7 @@ export const ShippingTracker: React.FC<ShippingTrackerProps> = ({
               <span className="info-value">{currentShipment.userEmail || 'Cliente Registrado'}</span>
             </div>
             <div className="info-box">
-              <span className="info-label">Transportista Oficial</span>
+              <span className="info-label">Transportista</span>
               <span className="info-value">{currentShipment.carrier || 'Starken Cloud Express'}</span>
             </div>
             <div className="info-box">
@@ -263,7 +266,7 @@ export const ShippingTracker: React.FC<ShippingTrackerProps> = ({
           {/* Panel Interactivo de Demostración */}
           <div className="demo-simulator-card">
             <div className="demo-simulator-header">
-              <span className="simulator-title">🛠️ Simulador Logístico Interactivo (Control de Estados)</span>
+              <span className="simulator-title">Simulador Logístico (Control de Estados)</span>
               <span className="simulator-subtitle">
                 Permite cambiar el estado del envío para probar en vivo la respuesta del microservicio <code>shipping-service</code>.
               </span>
@@ -274,31 +277,37 @@ export const ShippingTracker: React.FC<ShippingTrackerProps> = ({
                 onClick={() => handleStatusChange('PREPARING')}
                 disabled={isUpdating}
               >
-                🟡 Preparación
+                Preparación
               </button>
               <button
                 className={`btn-sim ${currentShipment.status === 'IN_TRANSIT' ? 'btn-sim-active' : ''}`}
                 onClick={() => handleStatusChange('IN_TRANSIT')}
                 disabled={isUpdating}
               >
-                🔵 En Tránsito
+                En Tránsito
               </button>
               <button
                 className={`btn-sim ${currentShipment.status === 'DELIVERED' ? 'btn-sim-active' : ''}`}
                 onClick={() => handleStatusChange('DELIVERED')}
                 disabled={isUpdating}
               >
-                🟢 Entregado
+                Entregado
               </button>
             </div>
           </div>
         </div>
       ) : (
         <div className="tracker-empty-card">
-          <div className="empty-icon">📦</div>
+          <div className="empty-icon-wrap">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="empty-svg-icon">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+          </div>
           <h3>Ingresa un código para rastrear tu envío</h3>
           <p>
-            Al realizar cualquier compra en la <strong>Tienda</strong>, el broker <strong>LavinMQ</strong> genera instantáneamente una guía de despacho única.
+            Al realizar cualquier compra en la <strong>Tienda</strong>, el broker <strong>LavinMQ</strong> genera una guía de despacho única.
           </p>
           {onGoToStore && (
             <button onClick={onGoToStore} className="btn-primary-small" style={{ marginTop: '1rem' }}>

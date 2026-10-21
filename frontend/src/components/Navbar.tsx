@@ -41,7 +41,7 @@ export const Navbar: React.FC<NavbarProps> = ({ itemCount, paginaActual, onCambi
             onClick={() => onCambiarPagina('envios')}
             title="Rastreo y estado de despacho en tiempo real con LavinMQ"
           >
-            🚚 Envíos y Rastreo
+            Envíos y Rastreo
           </button>
           {auth.isAuthenticated && (
             <button 
