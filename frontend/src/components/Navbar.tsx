@@ -3,8 +3,8 @@ import { useAuth } from '../auth/useAuth';
 
 interface NavbarProps {
   itemCount: number;
-  paginaActual: 'inicio' | 'tienda' | 'inventario' | 'pedidos';
-  onCambiarPagina: (pagina: 'inicio' | 'tienda' | 'inventario' | 'pedidos') => void;
+  paginaActual: 'inicio' | 'tienda' | 'inventario' | 'pedidos' | 'envios';
+  onCambiarPagina: (pagina: 'inicio' | 'tienda' | 'inventario' | 'pedidos' | 'envios') => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ itemCount, paginaActual, onCambiarPagina }) => {
@@ -35,6 +35,13 @@ export const Navbar: React.FC<NavbarProps> = ({ itemCount, paginaActual, onCambi
             onClick={() => onCambiarPagina('tienda')}
           >
             Tienda
+          </button>
+          <button 
+            className={`nav-btn ${paginaActual === 'envios' ? 'active' : ''}`}
+            onClick={() => onCambiarPagina('envios')}
+            title="Rastreo y estado de despacho en tiempo real con LavinMQ"
+          >
+            🚚 Envíos y Rastreo
           </button>
           {auth.isAuthenticated && (
             <button 
