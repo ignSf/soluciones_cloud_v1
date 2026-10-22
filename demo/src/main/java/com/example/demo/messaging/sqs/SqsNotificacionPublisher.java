@@ -8,13 +8,7 @@ import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
 
-/**
- * Productor SQS: publica un mensaje en la cola de notificaciones
- * cada vez que se crea un pedido.
- *
- * Regla clave: si SQS falla, el pedido NO se cae. Solo se registra el error,
- * porque la notificación es una tarea secundaria y asíncrona.
- */
+
 @Component
 public class SqsNotificacionPublisher {
 

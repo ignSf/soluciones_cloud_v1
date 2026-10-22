@@ -14,16 +14,6 @@ import software.amazon.awssdk.services.sqs.model.Message;
 import software.amazon.awssdk.services.sqs.model.MessageSystemAttributeName;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 
-/**
- * Consumidor SQS (long polling).
- *
- * Ciclo de cada mensaje:
- *  1. ReceiveMessage  -> el mensaje queda NO visible durante el visibility timeout.
- *  2. Procesar        -> NotificacionService.enviar(...)
- *  3a. Éxito          -> DeleteMessage con el receiptHandle (equivale al ACK de RabbitMQ).
- *  3b. Error          -> NO se borra. Vuelve a ser visible y se reintenta.
- *                        Al superar maxReceiveCount, SQS lo mueve a la DLQ (redrive policy).
- */
 @Component
 public class NotificacionWorker {
 

@@ -6,10 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-/**
- * Lógica de negocio: "enviar" la notificación al cliente.
- * Por ahora se simula con un log. Aquí se podría integrar Amazon SES para enviar un correo real.
- */
 @Service
 public class NotificacionService {
 
