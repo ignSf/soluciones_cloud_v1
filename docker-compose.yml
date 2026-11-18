@@ -49,6 +49,9 @@ services:
       AWS_REGION: ${AWS_REGION:-us-east-1}
       SQS_NOTIFICACIONES_ENABLED: ${SQS_NOTIFICACIONES_ENABLED:-false}
       SQS_NOTIFICACIONES_URL: ${SQS_NOTIFICACIONES_URL:-}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-}
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -77,7 +80,7 @@ services:
     restart: unless-stopped
 
   # Microservicio 2: Notificaciones (Consumidor Amazon SQS)
-  notificaciones-service:
+    notificaciones-service:
     build: ./notificaciones-service
     container_name: notificaciones-service
     ports:
@@ -89,6 +92,11 @@ services:
       SQS_NOTIFICACIONES_DLQ_URL: ${SQS_NOTIFICACIONES_DLQ_URL:-}
       SQS_CONSUMER_ENABLED: ${SQS_CONSUMER_ENABLED:-false}
       SIMULAR_FALLO: ${SIMULAR_FALLO:-false}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
     restart: unless-stopped
 
   # Microservicio 3: Envíos y Logística (Consumidor LavinMQ - Su Servicio)
