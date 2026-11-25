@@ -1,0 +1,16 @@
+# Kafka UI: administración de brokers y tópicos en http://localhost:8090
+# Requiere la red compartida y los brokers de docker-compose.kafka.yml levantados.
+services:
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8090:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-1:29092,kafka-2:29092
+    networks: [cloudnet]
+
+networks:
+  cloudnet:
+    external: true
