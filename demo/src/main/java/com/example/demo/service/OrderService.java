@@ -2,7 +2,6 @@ package com.example.demo.service;
 
 import com.example.demo.messaging.OrderEventPublisher;
 import com.example.demo.messaging.sqs.SqsNotificacionPublisher;
-import com.example.demo.messaging.lavinmq.LavinMqShippingPublisher;
 import com.example.demo.model.Order;
 import com.example.demo.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +22,6 @@ public class OrderService {
     // Bus 2: Amazon SQS -> notificaciones-service (Trabajo Compañero 2: Notificaciones y correos)
     private final SqsNotificacionPublisher sqsNotificacionPublisher;
 
-    // Bus 3: LavinMQ -> shipping-service (Su trabajo: Logística, despacho y tracking)
-    private final LavinMqShippingPublisher lavinMqShippingPublisher;
-
     public Order createOrder(Order order) {
         Order saved = orderRepository.save(order);
 
@@ -34,9 +30,6 @@ public class OrderService {
 
         // 2. Notifica a Amazon SQS para procesar el correo en notificaciones-service
         sqsNotificacionPublisher.publicarPedidoCreado(saved);
-
-        // 3. Notifica a LavinMQ para generar la orden de despacho en shipping-service
-        lavinMqShippingPublisher.publicarDespachoPedido(saved);
 
         return saved;
     }

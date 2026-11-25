@@ -1,5 +1,6 @@
 package com.example.shipping.controller;
 
+import com.example.shipping.messaging.ShippingOrderEvent;
 import com.example.shipping.model.Shipment;
 import com.example.shipping.service.ShippingService;
 import org.springframework.http.ResponseEntity;
@@ -47,5 +48,25 @@ public class ShippingController {
         return shippingService.updateStatus(id, newStatus)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
+     * Endpoint de demostración: genera un despacho y dispara el evento en Kafka.
+     */
+    @PostMapping("/test-order")
+    public ResponseEntity<Shipment> testOrder(
+            @RequestParam(defaultValue = "101") Long orderId,
+            @RequestParam(defaultValue = "Naruto Vol 2") String productName) {
+        Shipment shipment = shippingService.processOrderShipping(
+                new ShippingOrderEvent(
+                        orderId,
+                        "cliente@cloudstore.cl",
+                        3L,
+                        productName,
+                        1,
+                        15990.0
+                )
+        );
+        return ResponseEntity.ok(shipment);
     }
 }

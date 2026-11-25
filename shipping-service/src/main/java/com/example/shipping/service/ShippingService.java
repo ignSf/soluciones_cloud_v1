@@ -1,5 +1,6 @@
 package com.example.shipping.service;
 
+import com.example.shipping.kafka.ShippingEventPublisher;
 import com.example.shipping.messaging.ShippingOrderEvent;
 import com.example.shipping.model.Shipment;
 import com.example.shipping.repository.ShipmentRepository;
@@ -18,9 +19,11 @@ public class ShippingService {
     private static final Logger log = LoggerFactory.getLogger(ShippingService.class);
 
     private final ShipmentRepository shipmentRepository;
+    private final ShippingEventPublisher kafkaPublisher;
 
-    public ShippingService(ShipmentRepository shipmentRepository) {
+    public ShippingService(ShipmentRepository shipmentRepository, ShippingEventPublisher kafkaPublisher) {
         this.shipmentRepository = shipmentRepository;
+        this.kafkaPublisher = kafkaPublisher;
     }
 
     public Shipment processOrderShipping(ShippingOrderEvent event) {
@@ -28,7 +31,7 @@ public class ShippingService {
             throw new IllegalArgumentException("Evento de envío sin orderId");
         }
 
-        // Idempotencia: evitar despachos duplicados si el evento de LavinMQ se reintenta
+        // Idempotencia: evitar despachos duplicados para el mismo pedido
         Optional<Shipment> existente = shipmentRepository.findByOrderId(event.orderId());
         if (existente.isPresent()) {
             log.info("Despacho ya existente para pedidoId={}", event.orderId());
@@ -51,8 +54,10 @@ public class ShippingService {
         shipment.setCreatedAt(LocalDateTime.now());
 
         Shipment saved = shipmentRepository.save(shipment);
-        log.info("LavinMQ DESPACHO GENERADO: pedidoId={} tracking={} transportista={}",
+        log.info("DESPACHO GENERADO: pedidoId={} tracking={} transportista={}",
                 saved.getOrderId(), saved.getTrackingNumber(), saved.getCarrier());
+
+        kafkaPublisher.publishShippingStatus(saved);
         return saved;
     }
 
@@ -71,7 +76,9 @@ public class ShippingService {
     public Optional<Shipment> updateStatus(Long id, String newStatus) {
         return shipmentRepository.findById(id).map(s -> {
             s.setStatus(newStatus);
-            return shipmentRepository.save(s);
+            Shipment updated = shipmentRepository.save(s);
+            kafkaPublisher.publishShippingStatus(updated);
+            return updated;
         });
     }
 }
