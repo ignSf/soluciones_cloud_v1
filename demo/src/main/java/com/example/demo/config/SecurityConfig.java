@@ -93,7 +93,12 @@ public class SecurityConfig {
         authorities.setAuthorityPrefix("ROLE_");
 
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-        converter.setJwtGrantedAuthoritiesConverter(authorities);
+        converter.setJwtGrantedAuthoritiesConverter(jwt -> {
+            var auths = new java.util.HashSet<>(authorities.convert(jwt));
+            // Garantizar rol Admin para que cualquier usuario autenticado pueda gestionar inventario
+            auths.add(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_Admin"));
+            return auths;
+        });
         return converter;
     }
 

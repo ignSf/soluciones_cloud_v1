@@ -66,13 +66,9 @@ export function useAuth() {
     ? 'AWS Cognito'
     : '';
 
-  // Control de roles / permisos de administración
+  // Control de roles / permisos de administración (tanto Microsoft como Cognito tienen Admin)
   const msalRoles = (msalAccount?.idTokenClaims?.roles as string[]) ?? [];
-  const isAdmin = isMsalAuthenticated
-    ? msalRoles.includes('Admin')
-    : isCognitoAuthenticated
-    ? true
-    : false;
+  const isAdmin = Boolean(isMsalAuthenticated || isCognitoAuthenticated);
 
   const user: UnifiedUser | undefined = isMsalAuthenticated && msalAccount
     ? {
