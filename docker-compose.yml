@@ -80,7 +80,7 @@ services:
     restart: unless-stopped
 
   # Microservicio 2: Notificaciones (Consumidor Amazon SQS)
-    notificaciones-service:
+  notificaciones-service:
     build: ./notificaciones-service
     container_name: notificaciones-service
     ports:
