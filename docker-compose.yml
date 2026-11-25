@@ -49,7 +49,7 @@ services:
       SPRING_DATASOURCE_URL: ${INVENTORY_DATASOURCE_URL:-jdbc:h2:mem:inventorydb}
       SPRING_DATASOURCE_USERNAME: ${INVENTORY_DATASOURCE_USERNAME:-sa}
       SPRING_DATASOURCE_PASSWORD: ${INVENTORY_DATASOURCE_PASSWORD:-}
-      INVENTORY_SECURITY_OPEN: ${INVENTORY_SECURITY_OPEN:-false}
+      INVENTORY_SECURITY_OPEN: ${INVENTORY_SECURITY_OPEN:-true}
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_USER: ${RABBITMQ_USER:-guest}
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-guest}
@@ -102,6 +102,8 @@ services:
       args:
         VITE_API_URL: ${VITE_API_URL:-http://localhost:8080/api/products}
         VITE_ORDERS_API_URL: ${VITE_ORDERS_API_URL:-http://localhost:8080/api/orders}
+        VITE_SHIPPING_API_URL: ${VITE_SHIPPING_API_URL:-http://localhost:8083/api/shipping}
+        VITE_INVENTORY_API_URL: ${VITE_INVENTORY_API_URL:-http://localhost:8081/api/inventory}
     container_name: frontend
     ports:
       - "5173:80"
