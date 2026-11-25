@@ -176,21 +176,32 @@ export function App() {
       const created = await orderService.create(newOrder, userToken);
       setOrders((prev) => [created, ...prev]);
 
-      // Consultar despacho emitido a LavinMQ
-      const trackingCode = `TRK-CL-${(10000000 + ((created.id || 1) * 137) % 90000000)}`;
+      // Consultar despacho emitido automáticamente por Kafka
+      const fallbackCode = `TRK-CL-${(10000000 + ((created.id || 1) * 137) % 90000000)}`;
       if (created.id) {
-        shippingService.getByOrderId(created.id).then((shp) => {
-          if (shp) {
-            setShipmentsByOrder((prev) => ({ ...prev, [created.id!]: shp }));
+        const fetchShipment = async (retries = 4) => {
+          for (let i = 0; i < retries; i++) {
+            await new Promise((r) => setTimeout(r, 500 * (i + 1)));
+            try {
+              const shp = await shippingService.getByOrderId(created.id!);
+              if (shp) {
+                setShipmentsByOrder((prev) => ({ ...prev, [created.id!]: shp }));
+                setTriBrokerNotice((prev) => prev ? { ...prev, trackingNumber: shp.trackingNumber } : null);
+                break;
+              }
+            } catch (e) {
+              // Reintentar en siguiente ciclo
+            }
           }
-        });
+        };
+        fetchShipment();
       }
 
       // Notificación visual de la emisión Tri-Broker
       setTriBrokerNotice({
         orderId: created.id || 1,
         productName: product.name,
-        trackingNumber: trackingCode,
+        trackingNumber: fallbackCode,
       });
 
       // Refrescar stock de RabbitMQ
